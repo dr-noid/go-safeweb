@@ -32,13 +32,15 @@ use the cover tool to get a nice visual display:
 
 <The following is supposed to be repeated for each group member>
 
-<Group member name>
-Berat Kir
+Group Member: Berat Kir
 
 Function 1: echo
+
 Function 2: uptime
 
 ![alt text](existing-coverage/dr-noid-coverage.png)
+
+[GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/b071a38bd809d8afcf3be28dace3da369f5fe4c2)
 
 ## Coverage improvement
 
