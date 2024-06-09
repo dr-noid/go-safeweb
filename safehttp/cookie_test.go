@@ -133,3 +133,13 @@ func TestCookieValue(t *testing.T) {
 		t.Errorf("c.Value() got: %v want: %v", got, want)
 	}
 }
+
+
+func TestCoverage(t *testing.T) {
+    InitializeCoverageMap()
+    TestCookie(t)
+    TestCookieName(t)
+	TestCookieValue(t)
+
+    PrintCoverage()
+}

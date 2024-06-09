@@ -82,5 +82,12 @@ func TestFileServer(t *testing.T) {
 	}
 }
 
+func TestCoverageWrite(t *testing.T) {
+    safehttp.InitializeCoverageMap()
+    TestFileServer(t)
+
+	safehttp.PrintCoverage()
+}
+
 // TODO(kele): Add tests including interceptors once we have
 // https://github.com/google/go-safeweb/issues/261.

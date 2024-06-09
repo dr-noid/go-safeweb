@@ -56,12 +56,14 @@ func (fsrw *fileServerResponseWriter) Header() http.Header {
 func (fsrw *fileServerResponseWriter) Write(b []byte) (int, error) {
 	if !fsrw.committed {
 		fsrw.WriteHeader(int(StatusOK))
+		Coverage["Write-1"] = true
 	}
-
 	if fsrw.errored {
 		// Let the framework handle the error.
+		Coverage["Write-2"] = true
 		return 0, errors.New("discarded")
 	}
+	Coverage["Write-3"] = false
 	return fsrw.flight.rw.Write(b)
 }
 
