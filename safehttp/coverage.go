@@ -5,8 +5,8 @@ var Coverage = make(map[string]bool)
 func InitializeCoverageMap() {
 	// intialize the map with all branches as not taken, false
 	Coverage["flight/write-1"] = false
-	Coverage["flight/write-1"] = false
-	Coverage["flight/write-1"] = false
+	Coverage["flight/write-2"] = false
+	Coverage["flight/write-3"] = false
 
 	Coverage["flight/writeError-1"] = false
 	Coverage["flight/writeError-2"] = false
