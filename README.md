@@ -31,17 +31,18 @@ use the cover tool to get a nice visual display:
 
 <The following is supposed to be repeated for each group member>
 
-<Group member name>
+Group member name: Nika Emadian
 
-<Function 1 name>
+Function 1 name: SameSite
 
-<Show a patch (diff) or a link to a commit made in your forked repository that shows the instrumented code to gather coverage measurements>
+![](/existing-coverage/cookie.png)
 
-<Provide a screenshot of the coverage results output by the instrumentation>
+Function 2 name: Write 
 
-<Function 2 name>
+![](/existing-coverage/write.png)
 
-<Provide the same kind of information provided for Function 1>
+[GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/5fb77332308d05571fa3160aff046c01725fd559)
+
 
 ## Coverage improvement
 
