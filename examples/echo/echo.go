@@ -23,6 +23,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"sync"
 	"time"
 
 	"github.com/google/safehtml"
@@ -39,13 +42,38 @@ func main() {
 	addr := fmt.Sprintf("localhost:%d", port)
 	m := web.NewMuxConfigDev(port).Mux()
 
+	// Before the program starts, create data structures that hold coverage information about the branches;
+	safehttp.InitializeCoverageMap()
+
 	m.Handle("/echo", safehttp.MethodGet, safehttp.HandlerFunc(echo))
 	m.Handle("/uptime", safehttp.MethodGet, safehttp.HandlerFunc(uptime))
 
 	start = time.Now()
 	log.Printf("Visit http://%s\n", addr)
 	log.Printf("Listening on %s...\n", addr)
-	log.Fatal(http.ListenAndServe(addr, m))
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
+	// At the end of the program, write all information about the branches taken to a file or console.
+
+	wg := &sync.WaitGroup{}
+
+	wg.Add(1)
+	go func() {
+		for range c {
+			for k, v := range safehttp.Coverage {
+				if v {
+					fmt.Printf("Branch %s was taken\n", k)
+				} else {
+					fmt.Printf("Branch %s was not taken\n", k)
+				}
+			}
+			wg.Done()
+		}
+	}()
+	wg.Wait()
+	http.ListenAndServe(addr, m)
 }
 
 func echo(w safehttp.ResponseWriter, req *safehttp.IncomingRequest) safehttp.Result {
