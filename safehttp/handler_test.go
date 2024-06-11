@@ -56,8 +56,10 @@ func TestStripPrefix(t *testing.T) {
 	if got := rwStrip.Body.String(); got != rw.Body.String() {
 		t.Errorf("response body: got %q want %q", got, rw.Body.String())
 	}
-}
 
+}
+	
+// needs another test to cover the case where the prefix is empty
 func TestStripPrefixPanic(t *testing.T) {
 	mux := safehttp.NewServeMuxConfig(nil).Mux()
 
@@ -74,4 +76,37 @@ func TestStripPrefixPanic(t *testing.T) {
 		t.Errorf("expected panic")
 	}()
 	mux.ServeHTTP(rw, r)
+}
+
+func TestStripPrefixEmpty(t *testing.T) {
+    mux := safehttp.NewServeMuxConfig(nil).Mux()
+
+    mux.Handle("/", safehttp.MethodGet, BarHandler)
+    mux.Handle("/more/bar", safehttp.MethodGet, safehttp.StripPrefix("", BarHandler)) // Test with an empty prefix
+
+    r := httptest.NewRequest(safehttp.MethodGet, "http://foo.com/", nil)
+    rw := httptest.NewRecorder()
+    mux.ServeHTTP(rw, r)
+
+    rStrip := httptest.NewRequest(safehttp.MethodGet, "http://foo.com/more/bar", nil)
+    rwStrip := httptest.NewRecorder()
+    mux.ServeHTTP(rwStrip, rStrip)
+
+    if rwStrip.Code != rw.Code {
+        t.Errorf("Code got %v, want %v", rwStrip.Code, rw.Code)
+    }
+
+}
+
+
+
+// create coverage test for form.go
+func TestCoverageForm(t *testing.T) {
+	safehttp.InitializeCoverageMap()
+
+	TestStripPrefix(t)
+	TestStripPrefixEmpty(t)
+	TestStripPrefixPanic(t)
+
+	safehttp.PrintCoverage()
 }

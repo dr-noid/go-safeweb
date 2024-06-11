@@ -41,13 +41,17 @@ func (f HandlerFunc) ServeHTTP(w ResponseWriter, r *IncomingRequest) Result {
 // exactly (e.g. escaped and unescaped characters are considered different).
 func StripPrefix(prefix string, h Handler) Handler {
 	if prefix == "" {
+		Coverage["StripPrefix_1"] = true
 		return h
 	}
+	Coverage["StripPrefix_2"] = true
 	return HandlerFunc(func(rw ResponseWriter, ir *IncomingRequest) Result {
 		ir2, err := ir.WithStrippedURLPrefix(prefix)
 		if err != nil {
+			Coverage["StripPrefix_3"] = true
 			panic(err)
 		}
+		Coverage["StripPrefix_4"] = true
 		return h.ServeHTTP(rw, ir2)
 	})
 }
