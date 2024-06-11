@@ -63,7 +63,7 @@ func (fsrw *fileServerResponseWriter) Write(b []byte) (int, error) {
 		Coverage["Write-2"] = true
 		return 0, errors.New("discarded")
 	}
-	Coverage["Write-3"] = false
+	Coverage["Write-3"] = true
 	return fsrw.flight.rw.Write(b)
 }
 
