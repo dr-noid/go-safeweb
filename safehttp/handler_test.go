@@ -100,8 +100,8 @@ func TestStripPrefixEmpty(t *testing.T) {
 
 
 
-// create coverage test for form.go
-func TestCoverageForm(t *testing.T) {
+// create coverage test for handler.go
+func TestCoverageHandler(t *testing.T) {
 	safehttp.InitializeCoverageMap()
 
 	TestStripPrefix(t)

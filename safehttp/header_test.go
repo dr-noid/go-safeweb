@@ -408,7 +408,8 @@ func TestHeader_AddCookie(t *testing.T) {
     })
 }
 
-func TestCoverageForm(t *testing.T) {
+// create coverage test for header.go
+func TestCoverageHeader(t *testing.T) {
 	InitializeCoverageMap()
 
 	TestHeader_AddCookie(t)
