@@ -82,6 +82,8 @@ func TestFileServer(t *testing.T) {
 	}
 }
 
+
+
 func TestCoverageWrite(t *testing.T) {
     safehttp.InitializeCoverageMap()
     TestFileServer(t)
