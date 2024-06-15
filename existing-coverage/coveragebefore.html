@@ -1,0 +1,2406 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>safehttp: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/google/go-safeweb/safehttp/cookie.go (100.0%)</option>
+				
+				<option value="file1">github.com/google/go-safeweb/safehttp/coverage.go (0.0%)</option>
+				
+				<option value="file2">github.com/google/go-safeweb/safehttp/default_dispatcher.go (90.3%)</option>
+				
+				<option value="file3">github.com/google/go-safeweb/safehttp/dev.go (0.0%)</option>
+				
+				<option value="file4">github.com/google/go-safeweb/safehttp/dispatcher.go (100.0%)</option>
+				
+				<option value="file5">github.com/google/go-safeweb/safehttp/fileserver.go (88.2%)</option>
+				
+				<option value="file6">github.com/google/go-safeweb/safehttp/fileserver_1_16.go (100.0%)</option>
+				
+				<option value="file7">github.com/google/go-safeweb/safehttp/flight.go (89.5%)</option>
+				
+				<option value="file8">github.com/google/go-safeweb/safehttp/form.go (100.0%)</option>
+				
+				<option value="file9">github.com/google/go-safeweb/safehttp/handler.go (87.5%)</option>
+				
+				<option value="file10">github.com/google/go-safeweb/safehttp/header.go (82.9%)</option>
+				
+				<option value="file11">github.com/google/go-safeweb/safehttp/incoming_request.go (91.9%)</option>
+				
+				<option value="file12">github.com/google/go-safeweb/safehttp/interceptor.go (100.0%)</option>
+				
+				<option value="file13">github.com/google/go-safeweb/safehttp/internals.go (100.0%)</option>
+				
+				<option value="file14">github.com/google/go-safeweb/safehttp/migration.go (100.0%)</option>
+				
+				<option value="file15">github.com/google/go-safeweb/safehttp/mux.go (84.8%)</option>
+				
+				<option value="file16">github.com/google/go-safeweb/safehttp/response.go (0.0%)</option>
+				
+				<option value="file17">github.com/google/go-safeweb/safehttp/server.go (35.2%)</option>
+				
+				<option value="file18">github.com/google/go-safeweb/safehttp/status.go (50.0%)</option>
+				
+				<option value="file19">github.com/google/go-safeweb/safehttp/url.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "net/http"
+)
+
+// A Cookie represents an HTTP cookie as sent in the Set-Cookie header of an
+// HTTP response or the Cookie header of an HTTP request.
+//
+// See https://tools.ietf.org/html/rfc6265 for details.
+type Cookie struct {
+        wrapped *http.Cookie
+}
+
+// NewCookie creates a new Cookie with safe default settings.
+// Those safe defaults are:
+//   - Secure: true (if the framework is not in dev mode)
+//   - HttpOnly: true
+//   - SameSite: Lax
+//
+// For more info about all the options, see:
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
+func NewCookie(name, value string) *Cookie <span class="cov8" title="1">{
+        devMu.RLock()
+        defer devMu.RUnlock()
+        return &amp;Cookie{
+                &amp;http.Cookie{
+                        Name:     name,
+                        Value:    value,
+                        Secure:   !isLocalDev,
+                        HttpOnly: true,
+                        SameSite: http.SameSiteLaxMode,
+                },
+        }
+}</span>
+
+// SameSite allows a server to define a cookie attribute making it impossible for
+// the browser to send this cookie along with cross-site requests. The main
+// goal is to mitigate the risk of cross-origin information leakage, and provide
+// some protection against cross-site request forgery attacks.
+//
+// See https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00 for details.
+type SameSite int
+
+const (
+        // SameSiteLaxMode allows sending cookies with same-site requests and
+        // cross-site top-level navigations.
+        SameSiteLaxMode SameSite = iota + 1
+        // SameSiteStrictMode allows sending cookie only with same-site requests.
+        SameSiteStrictMode
+        // SameSiteNoneMode allows sending cookies with all requests, including the
+        // ones made cross-origin.
+        SameSiteNoneMode
+)
+
+// SameSite sets the SameSite attribute.
+func (c *Cookie) SameSite(s SameSite) <span class="cov8" title="1">{
+        switch s </span>{
+        case SameSiteLaxMode:<span class="cov8" title="1">
+                c.wrapped.SameSite = http.SameSiteLaxMode</span>
+        case SameSiteStrictMode:<span class="cov8" title="1">
+                c.wrapped.SameSite = http.SameSiteStrictMode</span>
+        case SameSiteNoneMode:<span class="cov8" title="1">
+                c.wrapped.SameSite = http.SameSiteNoneMode</span>
+        }
+}
+
+// SetMaxAge sets the MaxAge attribute.
+//
+// - MaxAge = 0 means no 'Max-Age' attribute specified.
+// - MaxAge &lt; 0 means delete cookie now, equivalently 'Max-Age: 0'
+// - MaxAge &gt; 0 means Max-Age attribute present and given in seconds
+func (c *Cookie) SetMaxAge(maxAge int) <span class="cov8" title="1">{
+        c.wrapped.MaxAge = maxAge
+}</span>
+
+// Path sets the path attribute.
+func (c *Cookie) Path(path string) <span class="cov8" title="1">{
+        c.wrapped.Path = path
+}</span>
+
+// Domain sets the domain attribute.
+func (c *Cookie) Domain(domain string) <span class="cov8" title="1">{
+        c.wrapped.Domain = domain
+}</span>
+
+// DisableSecure disables the secure attribute.
+func (c *Cookie) DisableSecure() <span class="cov8" title="1">{
+        c.wrapped.Secure = false
+}</span>
+
+// DisableHTTPOnly disables the HttpOnly attribute.
+func (c *Cookie) DisableHTTPOnly() <span class="cov8" title="1">{
+        c.wrapped.HttpOnly = false
+}</span>
+
+// Name returns the name of the cookie.
+func (c *Cookie) Name() string <span class="cov8" title="1">{
+        return c.wrapped.Name
+}</span>
+
+// Value returns the value of the cookie.
+func (c *Cookie) Value() string <span class="cov8" title="1">{
+        return c.wrapped.Value
+}</span>
+
+// String returns the serialization of the cookie for use in a Set-Cookie
+// response header. If c is nil or c.Name() is invalid, the empty string is
+// returned.
+func (c *Cookie) String() string <span class="cov8" title="1">{
+        return c.wrapped.String()
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package safehttp
+
+var Coverage = make(map[string]bool)
+
+func InitializeCoverageMap() {<span class="cov0" title="0">
+        // intialize the map with all branches as not taken, false
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "encoding/json"
+        "fmt"
+        "io"
+        "net/http"
+
+        "github.com/google/safehtml"
+        "github.com/google/safehtml/template"
+)
+
+// DefaultDispatcher is responsible for writing safe responses.
+type DefaultDispatcher struct{}
+
+// Write writes the response to the http.ResponseWriter if it's deemed safe. It
+// returns a non-nil error if the response is deemed unsafe or if the writing
+// operation fails.
+//
+// For JSONResponses, the underlying object is serialised and written if it's a
+// valid JSON.
+//
+// For TemplateResponses, the parsed template is applied to the provided data
+// object. If the funcMap is non-nil, its elements override the  existing names
+// to functions mappings in the template. An attempt to define a new name to
+// function mapping that is not already in the template will result in a panic.
+//
+// Write sets the Content-Type accordingly.
+func (DefaultDispatcher) Write(rw http.ResponseWriter, resp Response) error <span class="cov8" title="1">{
+        switch x := resp.(type) </span>{
+        case JSONResponse:<span class="cov8" title="1">
+                rw.Header().Set("Content-Type", "application/json; charset=utf-8")
+                io.WriteString(rw, ")]}',\n") // Break parsing of JavaScript in order to prevent XSSI.
+                return json.NewEncoder(rw).Encode(x.Data)</span>
+        case *TemplateResponse:<span class="cov8" title="1">
+                t, ok := (x.Template).(*template.Template)
+                if !ok </span><span class="cov0" title="0">{
+                        return fmt.Errorf("%T is not a safe template and it cannot be parsed and written", t)
+                }</span>
+                <span class="cov8" title="1">rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+                if len(x.FuncMap) == 0 </span><span class="cov8" title="1">{
+                        if x.Name == "" </span><span class="cov8" title="1">{
+                                return t.Execute(rw, x.Data)
+                        }</span>
+                        <span class="cov8" title="1">return t.ExecuteTemplate(rw, x.Name, x.Data)</span>
+                }
+                <span class="cov8" title="1">cloned, err := t.Clone()
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">cloned = cloned.Funcs(x.FuncMap)
+                if x.Name == "" </span><span class="cov8" title="1">{
+                        return cloned.Execute(rw, x.Data)
+                }</span>
+                <span class="cov0" title="0">return cloned.ExecuteTemplate(rw, x.Name, x.Data)</span>
+        case safehtml.HTML:<span class="cov8" title="1">
+                rw.Header().Set("Content-Type", "text/html; charset=utf-8")
+                _, err := io.WriteString(rw, x.String())
+                return err</span>
+        case FileServerResponse:<span class="cov8" title="1">
+                rw.Header().Set("Content-Type", x.ContentType())
+                // The http package will take care of writing the file body.
+                return nil</span>
+        case RedirectResponse:<span class="cov8" title="1">
+                http.Redirect(rw, x.Request.req, x.Location, int(x.Code))
+                return nil</span>
+        case NoContentResponse:<span class="cov8" title="1">
+                rw.WriteHeader(int(StatusNoContent))
+                return nil</span>
+        default:<span class="cov8" title="1">
+                return fmt.Errorf("%T is not a safe response type and it cannot be written", resp)</span>
+        }
+}
+
+// Error writes the error response to the http.ResponseWriter.
+//
+// Error sets the Content-Type to "text/plain; charset=utf-8" through calling
+// WriteTextError.
+func (DefaultDispatcher) Error(rw http.ResponseWriter, resp ErrorResponse) error <span class="cov8" title="1">{
+        writeTextError(rw, resp)
+        return nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import "sync"
+
+var (
+        devMu      sync.RWMutex
+        isLocalDev bool
+        // freezeLocalDev is set on Mux construction.
+        freezeLocalDev bool
+)
+
+// UseLocalDev instructs the framework to disable some security mechanisms that
+// would make local development hard or impossible. This cannot be undone without
+// restarting the program and should only be done before any other function or type
+// of the framework is used.
+// This function should ideally be called by the main package immediately after
+// flag parsing.
+// This configuration is not valid for production use.
+func UseLocalDev() <span class="cov0" title="0">{
+        devMu.Lock()
+        defer devMu.Unlock()
+        if freezeLocalDev </span><span class="cov0" title="0">{
+                panic("UseLocalDev can only be called before any other part of the framework")</span>
+        }
+        <span class="cov0" title="0">isLocalDev = true</span>
+}
+
+// IsLocalDev returns whether the framework is set up to use local development
+// rules. Please see the doc on UseLocalDev.
+func IsLocalDev() bool <span class="cov0" title="0">{
+        devMu.RLock()
+        defer devMu.RUnlock()
+        return isLocalDev
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import "net/http"
+
+// Dispatcher is responsible for writing a response received from the
+// ResponseWriter to the underlying http.ResponseWriter.
+//
+// The implementation of a custom Dispatcher should be thoroughly reviewed by
+// the security team to avoid introducing vulnerabilities.
+type Dispatcher interface {
+        // Write writes a Response to the underlying http.ResponseWriter.
+        //
+        // Write is responsible for setting the Content-Type response header. If the
+        // Dispatcher doesn't set the HTTP response status code, the default
+        // behavior of http.ResponseWriter applies (i.e. 200 OK is set on first
+        // Write).
+        //
+        // It should return an error if the writing operation fails or if the
+        // provided Response should not be written to the http.ResponseWriter
+        // because it's unsafe.
+        Write(rw http.ResponseWriter, resp Response) error
+
+        // Error writes an ErrorResponse to the underlying http.ResponseWriter.
+        //
+        // Error is responsible for setting the Content-Type response header and the
+        // HTTP response status code.
+        //
+        // It should return an error if the writing operation fails.
+        //
+        // Error should always attempt to write a response, no matter what is the
+        // underlying type of resp. As a fallback, the Dispatcher can use WriteTextError.
+        Error(rw http.ResponseWriter, resp ErrorResponse) error
+}
+
+func writeTextError(rw http.ResponseWriter, resp ErrorResponse) <span class="cov8" title="1">{
+        http.Error(rw, http.StatusText(int(resp.Code())), int(resp.Code()))
+}</span>
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "errors"
+        "net/http"
+)
+
+// FileServer returns a handler that serves HTTP requests with the contents of
+// the file system rooted at root.
+func FileServer(root string) Handler <span class="cov8" title="1">{
+        fileServer := http.FileServer(http.Dir(root))
+
+        return HandlerFunc(func(rw ResponseWriter, req *IncomingRequest) Result </span><span class="cov8" title="1">{
+                fsrw := &amp;fileServerResponseWriter{flight: rw.(*flight), header: http.Header{}}
+                fileServer.ServeHTTP(fsrw, req.req)
+                return fsrw.result
+        }</span>)
+}
+
+type fileServerResponseWriter struct {
+        flight *flight
+        result Result
+
+        // We don't allow direct access to the flight's underlying http.Header. We
+        // just copy over the contents on a call to WriteHeader, with the exception
+        // of the Content-Type header.
+        header http.Header
+
+        // Once WriteHeader is called, any subsequent calls to it are no-ops.
+        committed bool
+
+        // If the first call to WriteHeader is not a 200 OK, we call
+        // flight.WriteError with a 404 StatusCode and make further calls to Write
+        // no-ops in order to not leak information about the filesystem.
+        errored bool
+}
+
+func (fsrw *fileServerResponseWriter) Header() http.Header <span class="cov8" title="1">{
+        return fsrw.header
+}</span>
+
+func (fsrw *fileServerResponseWriter) Write(b []byte) (int, error) <span class="cov8" title="1">{
+        if !fsrw.committed </span><span class="cov0" title="0">{
+                fsrw.WriteHeader(int(StatusOK))
+        }</span>
+
+        <span class="cov8" title="1">if fsrw.errored </span><span class="cov8" title="1">{
+                // Let the framework handle the error.
+                return 0, errors.New("discarded")
+        }</span>
+        <span class="cov8" title="1">return fsrw.flight.rw.Write(b)</span>
+}
+
+func (fsrw *fileServerResponseWriter) WriteHeader(statusCode int) <span class="cov8" title="1">{
+        if fsrw.committed </span><span class="cov0" title="0">{
+                // We've already committed to a response. The headers and status code
+                // were written. Ignore this call.
+                return
+        }</span>
+        <span class="cov8" title="1">fsrw.committed = true
+
+        headers := fsrw.flight.Header()
+        ct := "application/octet-stream; charset=utf-8"
+        if len(fsrw.header["Content-Type"]) &gt; 0 </span><span class="cov8" title="1">{
+                ct = fsrw.header["Content-Type"][0]
+        }</span>
+        // Content-Type should have been set by the http.FileServer.
+        // Note: Add or Set might panic if a header has been already claimed. This
+        // is intended behavior.
+        <span class="cov8" title="1">for k, v := range fsrw.header </span><span class="cov8" title="1">{
+                if len(v) == 0 </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov8" title="1">if k == "Content-Type" </span><span class="cov8" title="1">{
+                        // Skip setting the Content-Type. The Dispatcher handles it.
+                        continue</span>
+                }
+                <span class="cov8" title="1">if headers.IsClaimed(k) </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov8" title="1">headers.Del(k)
+                for _, vv := range v </span><span class="cov8" title="1">{
+                        headers.Add(k, vv)
+                }</span>
+        }
+
+        <span class="cov8" title="1">if statusCode != int(StatusOK) </span><span class="cov8" title="1">{
+                fsrw.errored = true
+                // We are writing 404 for every error to avoid leaking information about
+                // the filesystem.
+                fsrw.result = fsrw.flight.WriteError(StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">fsrw.result = fsrw.flight.Write(FileServerResponse{
+                Path:        fsrw.flight.req.URL().Path(),
+                contentType: ct,
+        })</span>
+}
+
+// FileServerResponse represents a FileServer response.
+type FileServerResponse struct {
+        // The URL path.
+        Path string
+
+        // private, to not allow modifications
+        contentType string
+}
+
+// ContentType is the Content-Type of the response.
+func (resp FileServerResponse) ContentType() string <span class="cov8" title="1">{
+        return resp.contentType
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+//go:build go1.16
+// +build go1.16
+
+package safehttp
+
+import (
+        "embed"
+        "net/http"
+)
+
+func FileServerEmbed(fs embed.FS) Handler <span class="cov8" title="1">{
+        fileServer := http.FileServer(http.FS(fs))
+        return HandlerFunc(func(rw ResponseWriter, req *IncomingRequest) Result </span><span class="cov8" title="1">{
+                fsrw := &amp;fileServerResponseWriter{flight: rw.(*flight), header: http.Header{}}
+                fileServer.ServeHTTP(fsrw, req.req)
+                return fsrw.result
+        }</span>)
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "context"
+        "net/http"
+)
+
+// A single request "flight".
+type flight struct {
+        rw  http.ResponseWriter
+        req *IncomingRequest
+
+        cfg handlerConfig
+
+        code   StatusCode
+        header Header
+
+        written bool
+}
+
+// handlerConfig is the safe HTTP handler configuration, including the
+// dispatcher and interceptors.
+type handlerConfig struct {
+        Handler      Handler
+        Dispatcher   Dispatcher
+        Interceptors []configuredInterceptor
+}
+
+func processRequest(cfg handlerConfig, rw http.ResponseWriter, req *http.Request) <span class="cov8" title="1">{
+        f := &amp;flight{
+                cfg:    cfg,
+                rw:     rw,
+                header: NewHeader(rw.Header()),
+                req:    NewIncomingRequest(req),
+        }
+
+        // The net/http package handles all panics. In the early days of the
+        // framework we were handling them ourselves and running interceptors after
+        // a panic happened, but this adds lots of complexity to the codebase and
+        // still isn't perfect (e.g. what if Commit panics?). Instead, we just make
+        // sure to clear all the headers and cookies.
+        defer func() </span><span class="cov8" title="1">{
+                if r := recover(); r != nil </span><span class="cov8" title="1">{
+                        // Clear all headers.
+                        for h := range f.rw.Header() </span><span class="cov8" title="1">{
+                                delete(f.rw.Header(), h)
+                        }</span>
+                        <span class="cov8" title="1">panic(r)</span>
+                }
+        }()
+
+        <span class="cov8" title="1">for _, it := range f.cfg.Interceptors </span><span class="cov8" title="1">{
+                it.Before(f, f.req)
+                if f.written </span><span class="cov8" title="1">{
+                        return
+                }</span>
+        }
+        <span class="cov8" title="1">f.cfg.Handler.ServeHTTP(f, f.req)
+        if !f.written </span><span class="cov8" title="1">{
+                cfg.Dispatcher.Write(rw, NoContentResponse{})
+        }</span>
+}
+
+// Write dispatches the response to the Dispatcher. This will be written to the
+// underlying http.ResponseWriter if the Dispatcher decides it's safe to do so.
+func (f *flight) Write(resp Response) Result <span class="cov8" title="1">{
+        if f.written </span><span class="cov8" title="1">{
+                panic("ResponseWriter was already written to")</span>
+        }
+        <span class="cov8" title="1">f.written = true
+        f.commitPhase(resp)
+
+        if err := f.cfg.Dispatcher.Write(f.rw, resp); err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">return Result{}</span>
+}
+
+// WriteError writes an error response (400-599) according to the provided
+// status code.
+//
+// If the ResponseWriter has already been written to, then this method will panic.
+func (f *flight) WriteError(resp ErrorResponse) Result <span class="cov8" title="1">{
+        if f.written </span><span class="cov8" title="1">{
+                panic("ResponseWriter was already written to")</span>
+        }
+        <span class="cov8" title="1">f.written = true
+        f.commitPhase(resp)
+        if err := f.cfg.Dispatcher.Error(f.rw, resp); err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">return Result{}</span>
+}
+
+// Header returns the collection of headers that will be set on the response.
+// Headers must be set before writing a response.
+func (f *flight) Header() Header <span class="cov8" title="1">{
+        return f.header
+}</span>
+
+// AddCookie adds a Set-Cookie header to the provided ResponseWriter's headers.
+// The provided cookie must have a valid Name, otherwise an error will be
+// returned.
+func (f *flight) AddCookie(c *Cookie) error <span class="cov0" title="0">{
+        return f.header.addCookie(c)
+}</span>
+
+// commitPhase calls the Commit phases of all the interceptors. This stage will
+// run before a response is written to the ResponseWriter. If a response is
+// written to the ResponseWriter in a Commit phase then the Commit phases of the
+// remaining interceptors won'f execute.
+func (f *flight) commitPhase(resp Response) <span class="cov8" title="1">{
+        for i := len(f.cfg.Interceptors) - 1; i &gt;= 0; i-- </span><span class="cov8" title="1">{
+                f.cfg.Interceptors[i].Commit(f, f.req, resp)
+        }</span>
+}
+
+// Result is the result of writing an HTTP response.
+//
+// Use ResponseWriter methods to obtain it.
+type Result struct{}
+
+// NotWritten returns a Result which indicates that nothing has been written yet. It
+// can be used in all functions that return a Result, such as in the ServeHTTP method
+// of a Handler or in the Before method of an Interceptor. When returned, NotWritten
+// indicates that the writing of the response should take place later. When this
+// is returned by the Before method in Interceptors the next Interceptor in line
+// is run. When this is returned by a Handler, a 204 No Content response is written.
+func NotWritten() Result <span class="cov8" title="1">{
+        return Result{}
+}</span>
+
+type flightValues struct {
+        m map[interface{}]interface{}
+}
+
+func (fv flightValues) Put(key, value interface{}) <span class="cov8" title="1">{
+        fv.m[key] = value
+}</span>
+
+func (fv flightValues) Get(key interface{}) interface{} <span class="cov8" title="1">{
+        return fv.m[key]
+}</span>
+
+// Map is a key/value map.
+type Map interface {
+        // Put inserts a key/value pair into the map. If the key already exists in
+        // the map, it's value is replaced.
+        Put(key, value interface{})
+        // Get returns a value for a given key in the map. If the entry with a given
+        // key does not exist, nil is returned.
+        Get(key interface{}) interface{}
+}
+
+type flightValuesCtxKey struct{}
+
+// FlightValues returns a map associated with the given request processing flight.
+// Use it if your interceptors need state that has the lifetime of the request.
+func FlightValues(ctx context.Context) Map <span class="cov8" title="1">{
+        v := ctx.Value(flightValuesCtxKey{})
+        if v == nil </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">return v.(Map)</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "fmt"
+        "mime/multipart"
+        "path/filepath"
+        "strconv"
+)
+
+// Form contains parsed data from form parameters, part of
+// the body of POST, PATCH or PUT requests that are not multipart requests.
+type Form struct {
+        values map[string][]string
+        err    error
+}
+
+// Int64 returns the first form parameter value. If the first value is not a
+// valid int64, the defaultValue is returned instead and an error is set
+// (retrievable by Err()).
+func (f *Form) Int64(param string, defaultValue int64) int64 <span class="cov8" title="1">{
+        vals, ok := f.values[param]
+        if !ok </span><span class="cov8" title="1">{
+                return defaultValue
+        }</span>
+        <span class="cov8" title="1">paramVal, err := strconv.ParseInt(vals[0], 10, 64)
+        if err != nil </span><span class="cov8" title="1">{
+                f.err = err
+                return defaultValue
+        }</span>
+        <span class="cov8" title="1">return paramVal</span>
+}
+
+// Uint64 returns the first form parameter value. If the first value is not a
+// valid uint64, the defaultValue is returned instead and an error is set
+// (retrievable by Err()).
+func (f *Form) Uint64(param string, defaultValue uint64) uint64 <span class="cov8" title="1">{
+        vals, ok := f.values[param]
+        if !ok </span><span class="cov8" title="1">{
+                return defaultValue
+        }</span>
+        <span class="cov8" title="1">paramVal, err := strconv.ParseUint(vals[0], 10, 64)
+        if err != nil </span><span class="cov8" title="1">{
+                f.err = err
+                return defaultValue
+        }</span>
+        <span class="cov8" title="1">return paramVal</span>
+}
+
+// String returns the first form parameter value. If the first value is not a
+// valid string, the defaultValue is returned instead and an error is set
+// (retrievable by Err()).
+func (f *Form) String(param string, defaultValue string) string <span class="cov8" title="1">{
+        vals, ok := f.values[param]
+        if !ok </span><span class="cov8" title="1">{
+                return defaultValue
+        }</span>
+        <span class="cov8" title="1">return vals[0]</span>
+}
+
+// Float64 returns the first form parameter value. If the first value is not a
+// valid float64, the defaultValue is returned instead and an error is set
+// (retrievable by Err()).
+func (f *Form) Float64(param string, defaultValue float64) float64 <span class="cov8" title="1">{
+        vals, ok := f.values[param]
+        if !ok </span><span class="cov8" title="1">{
+                return defaultValue
+        }</span>
+        <span class="cov8" title="1">paramVal, err := strconv.ParseFloat(vals[0], 64)
+        if err != nil </span><span class="cov8" title="1">{
+                f.err = err
+                return defaultValue
+        }</span>
+        <span class="cov8" title="1">return paramVal</span>
+}
+
+// Bool returns the first form parameter value. If the first value is not a
+// valid bool, the defaultValue is returned instead and an error is set
+// (retrievable by Err()).
+func (f *Form) Bool(param string, defaultValue bool) bool <span class="cov8" title="1">{
+        vals, ok := f.values[param]
+        if !ok </span><span class="cov8" title="1">{
+                return defaultValue
+        }</span>
+        <span class="cov8" title="1">paramVal, err := strconv.ParseBool(vals[0])
+        if err != nil </span><span class="cov8" title="1">{
+                f.err = err
+                return defaultValue
+        }</span>
+        <span class="cov8" title="1">return paramVal</span>
+}
+
+func clearSlice(slicePtr interface{}) error <span class="cov8" title="1">{
+        switch vs := slicePtr.(type) </span>{
+        case *[]string:<span class="cov8" title="1">
+                *vs = nil</span>
+        case *[]int64:<span class="cov8" title="1">
+                *vs = nil</span>
+        case *[]float64:<span class="cov8" title="1">
+                *vs = nil</span>
+        case *[]uint64:<span class="cov8" title="1">
+                *vs = nil</span>
+        case *[]bool:<span class="cov8" title="1">
+                *vs = nil</span>
+        default:<span class="cov8" title="1">
+                return fmt.Errorf("type not supported in Slice call: %T", vs)</span>
+        }
+        <span class="cov8" title="1">return nil</span>
+}
+
+// Slice returns the form parameter values. If the values don't have the same
+// type, slicePtr will point to a nil slice instead and an error is set
+// (retrievable by Err()). This function should be used in case a form parameter
+// maps to multiple values.
+//
+// TODO(mihalimara22): Simplify this function to avoid duplicate logic
+func (f *Form) Slice(param string, slicePtr interface{}) <span class="cov8" title="1">{
+        mapVals, ok := f.values[param]
+        if !ok </span><span class="cov8" title="1">{
+                f.err = clearSlice(slicePtr)
+                return
+        }</span>
+
+        <span class="cov8" title="1">switch values := slicePtr.(type) </span>{
+        case *[]string:<span class="cov8" title="1">
+                res := make([]string, 0, len(mapVals))
+                *values = append(res, mapVals...)</span>
+        case *[]int64:<span class="cov8" title="1">
+                res := make([]int64, 0, len(mapVals))
+                for _, x := range mapVals </span><span class="cov8" title="1">{
+                        x, err := strconv.ParseInt(x, 10, 64)
+                        if err != nil </span><span class="cov8" title="1">{
+                                f.err = err
+                                *values = nil
+                                return
+                        }</span>
+                        <span class="cov8" title="1">res = append(res, x)</span>
+                }
+                <span class="cov8" title="1">*values = res</span>
+        case *[]uint64:<span class="cov8" title="1">
+                res := make([]uint64, 0, len(mapVals))
+                for _, x := range mapVals </span><span class="cov8" title="1">{
+                        x, err := strconv.ParseUint(x, 10, 64)
+                        if err != nil </span><span class="cov8" title="1">{
+                                f.err = err
+                                *values = nil
+                                return
+                        }</span>
+                        <span class="cov8" title="1">res = append(res, x)</span>
+                }
+                <span class="cov8" title="1">*values = res</span>
+        case *[]float64:<span class="cov8" title="1">
+                res := make([]float64, 0, len(mapVals))
+                for _, x := range mapVals </span><span class="cov8" title="1">{
+                        x, err := strconv.ParseFloat(x, 64)
+                        if err != nil </span><span class="cov8" title="1">{
+                                f.err = err
+                                *values = nil
+                                return
+                        }</span>
+                        <span class="cov8" title="1">res = append(res, x)</span>
+                }
+                <span class="cov8" title="1">*values = res</span>
+        case *[]bool:<span class="cov8" title="1">
+                res := make([]bool, 0, len(mapVals))
+                for _, x := range mapVals </span><span class="cov8" title="1">{
+                        b, err := strconv.ParseBool(x)
+                        if err != nil </span><span class="cov8" title="1">{
+                                f.err = err
+                                *values = nil
+                                return
+                        }</span>
+                        <span class="cov8" title="1">res = append(res, b)</span>
+                }
+                <span class="cov8" title="1">*values = res</span>
+        default:<span class="cov8" title="1">
+                f.err = clearSlice(slicePtr)</span>
+        }
+}
+
+// Err returns nil unless an error occurred while accessing a parsed form value.
+// Calling this method will return the last error that occurred while parsing
+// form values.
+func (f *Form) Err() error <span class="cov8" title="1">{
+        return f.err
+}</span>
+
+// MultipartForm extends a parsed multipart form, part of the body of a
+// PATCH, POST or PUT request. A multipart form can include both form values and
+// file uploads, stored either in memory or on disk.
+type MultipartForm struct {
+        Form
+        mf *multipart.Form
+}
+
+// newMultipartForm constructs a new MultipartForm with sanitized values.
+func newMulipartForm(mf *multipart.Form) *MultipartForm <span class="cov8" title="1">{
+        return &amp;MultipartForm{
+                Form: Form{
+                        values: mf.Value,
+                },
+                mf: sanitizeFilenames(mf),
+        }
+}</span>
+
+// sanitizeFilenames removes trailing path separators from all file names.
+// This is to ensure that uploaded files are not stored outside of the
+// designated directory.
+func sanitizeFilenames(f *multipart.Form) *multipart.Form <span class="cov8" title="1">{
+        for _, f := range f.File </span><span class="cov8" title="1">{
+                for _, fh := range f </span><span class="cov8" title="1">{
+                        fh.Filename = filepath.Base(fh.Filename)
+                }</span>
+        }
+        <span class="cov8" title="1">return f</span>
+}
+
+// File returns the file parts associated with form key param or a nil
+// slice, if none. These can be then opened individually by calling
+// FileHeader.Open.
+func (f *MultipartForm) File(param string) []*multipart.FileHeader <span class="cov8" title="1">{
+        fh, ok := f.mf.File[param]
+        if !ok </span><span class="cov8" title="1">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">return fh</span>
+}
+
+// RemoveFiles removes any temporary files associated with a Form and returns
+// the first error that occured, if any.
+func (f *MultipartForm) RemoveFiles() error <span class="cov8" title="1">{
+        return f.mf.RemoveAll()
+}</span>
+
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+// Handler responds to an HTTP request.
+type Handler interface {
+        // ServeHTTP writes the response exactly once, returning the result
+        //
+        // Except for reading the body, handlers should not modify the provided Request.
+        //
+        // TODO: Add documentation about error handling when properly implemented.
+        ServeHTTP(ResponseWriter, *IncomingRequest) Result
+}
+
+// HandlerFunc is used to convert a function into a Handler.
+type HandlerFunc func(ResponseWriter, *IncomingRequest) Result
+
+// ServeHTTP calls f(w, r).
+func (f HandlerFunc) ServeHTTP(w ResponseWriter, r *IncomingRequest) Result <span class="cov8" title="1">{
+        return f(w, r)
+}</span>
+
+// StripPrefix returns a handler that serves HTTP requests by removing the given
+// prefix from the request URL's Path (and RawPath if set) and invoking the
+// handler h.
+//
+// StripPrefix handles a request for a path that doesn't begin with prefix by
+// panicking, as this is a server configuration error. The prefix must match
+// exactly (e.g. escaped and unescaped characters are considered different).
+func StripPrefix(prefix string, h Handler) Handler <span class="cov8" title="1">{
+        if prefix == "" </span><span class="cov0" title="0">{
+                return h
+        }</span>
+        <span class="cov8" title="1">return HandlerFunc(func(rw ResponseWriter, ir *IncomingRequest) Result </span><span class="cov8" title="1">{
+                ir2, err := ir.WithStrippedURLPrefix(prefix)
+                if err != nil </span><span class="cov8" title="1">{
+                        panic(err)</span>
+                }
+                <span class="cov8" title="1">return h.ServeHTTP(rw, ir2)</span>
+        })
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "errors"
+        "fmt"
+        "net/http"
+        "net/textproto"
+)
+
+// Header represents the key-value pairs in an HTTP header.
+// The keys will be in canonical form, as returned by
+// textproto.CanonicalMIMEHeaderKey.
+type Header struct {
+        wrapped http.Header
+        claimed map[string]bool
+}
+
+// NewHeader creates a new Header.
+func NewHeader(h http.Header) Header <span class="cov8" title="1">{
+        if h == nil </span><span class="cov0" title="0">{
+                h = http.Header{}
+        }</span>
+        <span class="cov8" title="1">return Header{
+                wrapped: h,
+                claimed: map[string]bool{},
+        }</span>
+}
+
+// Claim claims the header with the given name and returns a function
+// which can be used to set the header. The name is first canonicalized
+// using textproto.CanonicalMIMEHeaderKey. Other methods in
+// the struct can't write to, change or delete the header with this
+// name. These methods will instead panic when applied on a claimed
+// header. The only way to modify the header is to use the returned
+// function. The Set-Cookie header can't be claimed.
+func (h Header) Claim(name string) (set func([]string)) <span class="cov8" title="1">{
+        name = textproto.CanonicalMIMEHeaderKey(name)
+        if err := h.writableHeader(name); err != nil </span><span class="cov8" title="1">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">h.claimed[name] = true
+        return func(v []string) </span><span class="cov8" title="1">{
+                if v == nil </span><span class="cov0" title="0">{
+                        return
+                }</span>
+                <span class="cov8" title="1">h.wrapped[name] = v</span>
+        }
+}
+
+// IsClaimed reports whether the provided header is already claimed. The name is
+// first canonicalized using textproto.CanonicalMIMEHeaderKey. The Set-Cookie header
+// is treated as claimed.
+func (h Header) IsClaimed(name string) bool <span class="cov8" title="1">{
+        name = textproto.CanonicalMIMEHeaderKey(name)
+        err := h.writableHeader(name)
+        return err != nil
+}</span>
+
+// Set sets the header with the given name to the given value.
+// The name is first canonicalized using textproto.CanonicalMIMEHeaderKey.
+// This method first removes all other values associated with this
+// header before setting the new value. It panics when applied on claimed headers
+// or on the Set-Cookie header.
+func (h Header) Set(name, value string) <span class="cov8" title="1">{
+        name = textproto.CanonicalMIMEHeaderKey(name)
+        if err := h.writableHeader(name); err != nil </span><span class="cov8" title="1">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">h.wrapped.Set(name, value)</span>
+}
+
+// Add adds a new header with the given name and the given value to
+// the collection of headers. The name is first canonicalized using
+// textproto.CanonicalMIMEHeaderKey. It panics when applied
+// on claimed headers or on the Set-Cookie header.
+func (h Header) Add(name, value string) <span class="cov8" title="1">{
+        name = textproto.CanonicalMIMEHeaderKey(name)
+        if err := h.writableHeader(name); err != nil </span><span class="cov8" title="1">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">h.wrapped.Add(name, value)</span>
+}
+
+// Del deletes all headers with the given name. The name is first canonicalized
+// using textproto.CanonicalMIMEHeaderKey. It panics when applied on claimed headers
+// or on the Set-Cookie header.
+func (h Header) Del(name string) <span class="cov8" title="1">{
+        name = textproto.CanonicalMIMEHeaderKey(name)
+        if err := h.writableHeader(name); err != nil </span><span class="cov8" title="1">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">h.wrapped.Del(name)</span>
+}
+
+// Get returns the value of the first header with the given name.
+// The name is first canonicalized using textproto.CanonicalMIMEHeaderKey.
+// If no header exists with the given name then "" is returned.
+func (h Header) Get(name string) string <span class="cov8" title="1">{
+        return h.wrapped.Get(name)
+}</span>
+
+// Values returns all the values of all the headers with the given name.
+// The name is first canonicalized using textproto.CanonicalMIMEHeaderKey.
+// The values are returned in the same order as they were sent in the request.
+// The values are returned as a copy of the original slice of strings in
+// the internal header map. This is to prevent modification of the original
+// slice. If no header exists with the given name then an empty slice is
+// returned.
+func (h Header) Values(name string) []string <span class="cov8" title="1">{
+        v := h.wrapped.Values(name)
+        clone := make([]string, len(v))
+        copy(clone, v)
+        return clone
+}</span>
+
+// addCookie adds the cookie provided as a Set-Cookie header in the header
+// collection. If the cookie is nil or cookie.Name() is invalid, no header is
+// added and an error is returned. This is the only method that can modify the
+// Set-Cookie header. If other methods try to modify the header they will return
+// errors.
+func (h Header) addCookie(c *Cookie) error <span class="cov0" title="0">{
+        v := c.String()
+        if v == "" </span><span class="cov0" title="0">{
+                return errors.New("invalid cookie name")
+        }</span>
+        <span class="cov0" title="0">h.wrapped.Add("Set-Cookie", v)
+        return nil</span>
+}
+
+// TODO: Add Write, WriteSubset and Clone when needed.
+
+// writableHeader assumes that the given name already has been canonicalized
+// using textproto.CanonicalMIMEHeaderKey.
+func (h Header) writableHeader(name string) error <span class="cov8" title="1">{
+        // TODO(@mattiasgrenfeldt, @kele, @empijei): Think about how this should
+        // work during legacy conversions.
+        if name == "Set-Cookie" </span><span class="cov8" title="1">{
+                return errors.New("can't write to Set-Cookie header")
+        }</span>
+        <span class="cov8" title="1">if h.claimed[name] </span><span class="cov8" title="1">{
+                return fmt.Errorf("claimed header: %s", name)
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "context"
+        "crypto/tls"
+        "fmt"
+        "io"
+        "net/http"
+        "net/url"
+        "strings"
+        "sync"
+)
+
+// IncomingRequest represents an HTTP request received by the server.
+type IncomingRequest struct {
+        // Header is the collection of HTTP headers.
+        //
+        // The Host header is removed from this struct and can be retrieved using Host()
+        Header Header
+        // TLS is set just like this TLS field of the net/http.Request. For more information
+        // see https://pkg.go.dev/net/http?tab=doc#Request.
+        TLS *tls.ConnectionState
+        req *http.Request
+
+        // The fields below are kept as pointers to allow cloning through
+        // IncomingRequest.WithContext. Otherwise, we'd need to copy locks.
+        postParseOnce      *sync.Once
+        multipartParseOnce *sync.Once
+}
+
+// NewIncomingRequest creates an IncomingRequest
+// from the underlying http.Request.
+func NewIncomingRequest(req *http.Request) *IncomingRequest <span class="cov8" title="1">{
+        if req == nil </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">req = req.WithContext(context.WithValue(req.Context(),
+                flightValuesCtxKey{}, flightValues{m: make(map[interface{}]interface{})}))
+        return &amp;IncomingRequest{
+                req:                req,
+                Header:             NewHeader(req.Header),
+                TLS:                req.TLS,
+                postParseOnce:      &amp;sync.Once{},
+                multipartParseOnce: &amp;sync.Once{},
+        }</span>
+}
+
+// Body returns the request body reader. It is always non-nil but will return
+// EOF immediately when no body is present.
+func (r *IncomingRequest) Body() io.ReadCloser <span class="cov0" title="0">{
+        return r.req.Body
+}</span>
+
+// Host returns the host the request is targeted to. This value comes from the
+// Host header.
+func (r *IncomingRequest) Host() string <span class="cov0" title="0">{
+        return r.req.Host
+}</span>
+
+// Method returns the HTTP method of the IncomingRequest.
+func (r *IncomingRequest) Method() string <span class="cov0" title="0">{
+        return r.req.Method
+}</span>
+
+// PostForm parses the form parameters provided in the body of a POST, PATCH or
+// PUT request that does not have Content-Type: multipart/form-data. It returns
+// the parsed form parameters as a Form object. If a parsing
+// error occurs it will return it, together with a nil Form. Unless we expect
+// the header Content-Type: multipart/form-data in a POST request, this method
+// should  always be used for forms in POST requests.
+func (r *IncomingRequest) PostForm() (*Form, error) <span class="cov8" title="1">{
+        var err error
+        r.postParseOnce.Do(func() </span><span class="cov8" title="1">{
+                if m := r.req.Method; m != MethodPost &amp;&amp; m != MethodPatch &amp;&amp; m != MethodPut </span><span class="cov8" title="1">{
+                        err = fmt.Errorf("got request method %s, want POST/PATCH/PUT", m)
+                        return
+                }</span>
+
+                <span class="cov8" title="1">if ct := r.req.Header.Get("Content-Type"); ct != "application/x-www-form-urlencoded" </span><span class="cov8" title="1">{
+                        err = fmt.Errorf("invalid method called for Content-Type: %s", ct)
+                        return
+                }</span>
+
+                <span class="cov8" title="1">err = r.req.ParseForm()</span>
+        })
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;Form{values: r.req.PostForm}, nil</span>
+}
+
+// MultipartForm parses the form parameters provided in the body of a POST,
+// PATCH or PUT request that has Content-Type set to multipart/form-data. It
+// returns a MultipartForm object containing the parsed form parameters and
+// file uploads (if any) or the parsing error together with a nil MultipartForm
+// otherwise.
+//
+// If the parsed request body is larger than maxMemory, up to maxMemory bytes
+// will be stored in main memory, with the rest stored on disk in temporary
+// files.
+func (r *IncomingRequest) MultipartForm(maxMemory int64) (*MultipartForm, error) <span class="cov8" title="1">{
+        var err error
+        r.multipartParseOnce.Do(func() </span><span class="cov8" title="1">{
+                if m := r.req.Method; m != MethodPost &amp;&amp; m != MethodPatch &amp;&amp; m != MethodPut </span><span class="cov8" title="1">{
+                        err = fmt.Errorf("got request method %s, want POST/PATCH/PUT", m)
+                        return
+                }</span>
+
+                <span class="cov8" title="1">if ct := r.req.Header.Get("Content-Type"); !strings.HasPrefix(ct, "multipart/form-data") </span><span class="cov8" title="1">{
+                        err = fmt.Errorf("invalid method called for Content-Type: %s", ct)
+                        return
+                }</span>
+                <span class="cov8" title="1">err = r.req.ParseMultipartForm(maxMemory)</span>
+        })
+        <span class="cov8" title="1">if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return newMulipartForm(r.req.MultipartForm), nil</span>
+}
+
+// Cookie returns the named cookie provided in the request or
+// net/http.ErrNoCookie if not found. If multiple cookies match the given name,
+// only one cookie will be returned.
+func (r *IncomingRequest) Cookie(name string) (*Cookie, error) <span class="cov8" title="1">{
+        c, err := r.req.Cookie(name)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;Cookie{wrapped: c}, nil</span>
+}
+
+// Cookies parses and returns the HTTP cookies sent with the request.
+func (r *IncomingRequest) Cookies() []*Cookie <span class="cov8" title="1">{
+        cl := r.req.Cookies()
+        res := make([]*Cookie, 0, len(cl))
+        for _, c := range cl </span><span class="cov8" title="1">{
+                res = append(res, &amp;Cookie{wrapped: c})
+        }</span>
+        <span class="cov8" title="1">return res</span>
+}
+
+// Context returns the context of a safehttp.IncomingRequest. This is always
+// non-nil and will default to the background context. The context of a
+// safehttp.IncomingRequest is the context of the underlying http.Request.
+//
+// The context is cancelled when the client's connection
+// closes, the request is canceled (with HTTP/2), or when the ServeHTTP method
+// returns.
+func (r *IncomingRequest) Context() context.Context <span class="cov8" title="1">{
+        return r.req.Context()
+}</span>
+
+// WithContext returns a shallow copy of the request with its context changed to
+// ctx. The provided ctx must be non-nil.
+//
+// This is similar to the net/http.Request.WithContext method.
+func (r *IncomingRequest) WithContext(ctx context.Context) *IncomingRequest <span class="cov8" title="1">{
+        r2 := new(IncomingRequest)
+        *r2 = *r
+        r2.req = r2.req.WithContext(ctx)
+        return r2
+}</span>
+
+// URL specifies the URL that is parsed from the Request-Line. For most requests,
+// only URL.Path() will return a non-empty result. (See RFC 7230, Section 5.3)
+func (r *IncomingRequest) URL() *URL <span class="cov8" title="1">{
+        return &amp;URL{url: r.req.URL}
+}</span>
+
+// WithStrippedURLPrefix returns a shallow copy of the request with its URL
+// stripped of a prefix. The prefix has to match exactly (e.g. escaped and
+// unescaped characters are considered different).
+func (r *IncomingRequest) WithStrippedURLPrefix(prefix string) (*IncomingRequest, error) <span class="cov8" title="1">{
+        req := rawRequest(r)
+        if !strings.HasPrefix(req.URL.Path, prefix) </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("Path %q doesn't have prefix %q", req.URL.Path, prefix)
+        }</span>
+        <span class="cov8" title="1">if req.URL.RawPath != "" &amp;&amp; !strings.HasPrefix(req.URL.RawPath, prefix) </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("RawPath %q doesn't have prefix %q", req.URL.RawPath, prefix)
+        }</span>
+
+        <span class="cov8" title="1">req2 := new(http.Request)
+        *req2 = *req
+        req2.URL = new(url.URL)
+        *req2.URL = *req.URL
+        req2.URL.Path = strings.TrimPrefix(req.URL.Path, prefix)
+        req2.URL.RawPath = strings.TrimPrefix(req.URL.RawPath, prefix)
+
+        r2 := new(IncomingRequest)
+        *r2 = *r
+        r2.req = req2
+
+        return r2, nil</span>
+}
+
+func rawRequest(r *IncomingRequest) *http.Request <span class="cov8" title="1">{
+        return r.req
+}</span>
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+// Interceptor alter the processing of incoming requests.
+//
+// See the documentation for ServeMux.ServeHTTP to understand how interceptors
+// are run, what happens in case of errors during request processing (i.e. which
+// interceptor methods are guaranteed to be run) etc.
+//
+// Interceptors keep their state across many requests and their methods can be
+// called concurrently. If you need per-request state, use FlightValues.
+type Interceptor interface {
+        // Before runs before the IncomingRequest is sent to the handler. If a
+        // response is written to the ResponseWriter, then the remaining
+        // interceptors and the handler won't execute. If Before panics, it will be
+        // recovered and the ServeMux will respond with 500 Internal Server Error.
+        Before(w ResponseWriter, r *IncomingRequest, cfg InterceptorConfig) Result
+
+        // Commit runs before the response is written by the Dispatcher. If an error
+        // is written to the ResponseWriter, then the Commit phases from the
+        // remaining interceptors won't execute.
+        Commit(w ResponseHeadersWriter, r *IncomingRequest, resp Response, cfg InterceptorConfig)
+
+        // Match checks whether the given config is meant to be applied to the Interceptor.
+        Match(InterceptorConfig) bool
+}
+
+// InterceptorConfig is a configuration for an interceptor.
+type InterceptorConfig interface{}
+
+// configuredInterceptor holds an interceptor together with its configuration.
+type configuredInterceptor struct {
+        interceptor Interceptor
+        config      InterceptorConfig
+}
+
+// Before runs before the IncomingRequest is sent to the handler. If a
+// response is written to the ResponseWriter, then the remaining
+// interceptors and the handler won't execute. If Before panics, it will be
+// recovered and the ServeMux will respond with 500 Internal Server Error.
+func (ci *configuredInterceptor) Before(w ResponseWriter, r *IncomingRequest) Result <span class="cov8" title="1">{
+        return ci.interceptor.Before(w, r, ci.config)
+}</span>
+
+// Commit runs before the response is written by the Dispatcher. If an error
+// is written to the ResponseWriter, then the Commit phases from the
+// remaining interceptors won't execute.
+func (ci *configuredInterceptor) Commit(w ResponseHeadersWriter, r *IncomingRequest, resp Response) <span class="cov8" title="1">{
+        ci.interceptor.Commit(w, r, resp, ci.config)
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "github.com/google/go-safeweb/safehttp/internal"
+)
+
+func init() <span class="cov8" title="1">{
+        internal.RawRequest = rawRequest
+}</span>
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "net/http"
+)
+
+// RegisteredHandler returns the combined (all request methods) handler
+// registered for a given pattern. Returns nil if the exact pattern wasn't used
+// to register any handlers.
+//
+// This method is helpful for migrating services incrementally, endpoint by
+// endpoint. The handler runs all the installed interceptors and the dispatcher.
+//
+// # Important
+//
+// This function does not attempt to do any kind of path matching. If the
+// handler was registered using the ServeMuxConfig for a pattern "/foo/", this
+// method will return the handler only when given "/foo/" as an argument, not
+// "/foo" nor "/foo/x".
+func RegisteredHandler(mux *ServeMux, pattern string) http.Handler <span class="cov8" title="1">{
+        if h, ok := mux.handlers[pattern]; ok </span><span class="cov8" title="1">{
+                return h
+        }</span>
+        // Keep this. Otherwise mux.handlerMap[pattern] returns a
+        // (*registeredHandler)(nil), which is not equal to an untyped nil.
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "fmt"
+        "log"
+        "net/http"
+)
+
+// The HTTP request methods defined by RFC.
+const (
+        MethodConnect = "CONNECT" // RFC 7231, 4.3.6
+        MethodDelete  = "DELETE"  // RFC 7231, 4.3.5
+        MethodGet     = "GET"     // RFC 7231, 4.3.1
+        MethodHead    = "HEAD"    // RFC 7231, 4.3.2
+        MethodOptions = "OPTIONS" // RFC 7231, 4.3.7
+        MethodPatch   = "PATCH"   // RFC 5789
+        MethodPost    = "POST"    // RFC 7231, 4.3.3
+        MethodPut     = "PUT"     // RFC 7231, 4.3.4
+        MethodTrace   = "TRACE"   // RFC 7231, 4.3.8
+)
+
+// ServeMux is an HTTP request multiplexer. It matches the URL of each incoming
+// request against a list of registered patterns and calls the handler for
+// the pattern that most closely matches the URL.
+//
+// Patterns names are fixed, rooted paths, like "/favicon.ico", or rooted
+// subtrees like "/images/" (note the trailing slash). Longer patterns take
+// precedence over shorter ones, so that if there are handlers registered for
+// both "/images/" and "/images/thumbnails/", the latter handler will be called
+// for paths beginning "/images/thumbnails/" and the former will receive
+// requests for any other paths in the "/images/" subtree.
+//
+// Note that since a pattern ending in a slash names a rooted subtree, the
+// pattern "/" matches all paths not matched by other registered patterns,
+// not just the URL with Path == "/".
+//
+// If a subtree has been registered and a request is received naming the subtree
+// root without its trailing slash, ServeMux redirects that request to
+// the subtree root (adding the trailing slash). This behavior can be overridden
+// with a separate registration for the path without the trailing slash. For
+// example, registering "/images/" causes ServeMux to redirect a request for
+// "/images" to "/images/", unless "/images" has been registered separately.
+//
+// Patterns may optionally begin with a host name, restricting matches to URLs
+// on that host only.  Host-specific patterns take precedence over general
+// patterns, so that a handler might register for the two patterns "/codesearch"
+// and "codesearch.google.com/" without also taking over requests for
+// "http://www.google.com/".
+//
+// ServeMux also takes care of sanitizing the URL request path and the Host
+// header, stripping the port number and redirecting any request containing . or
+// .. elements or repeated slashes to an equivalent, cleaner URL.
+//
+// Multiple handlers can be registered for a single pattern, as long as they
+// handle different HTTP methods.
+type ServeMux struct {
+        mux      *http.ServeMux
+        handlers map[string]*registeredHandler
+
+        dispatcher       Dispatcher
+        interceptors     []Interceptor
+        methodNotAllowed handlerConfig
+}
+
+// ServeHTTP dispatches the request to the handler whose method matches the
+// incoming request and whose pattern most closely matches the request URL.
+//
+//        For each incoming request:
+//        - [Before Phase] Interceptor.Before methods are called for every installed
+//          interceptor, until an interceptor writes to a ResponseWriter (including
+//          errors) or panics,
+//        - the handler is called after a [Before Phase] if no writes or panics occured,
+//        - the handler triggers the [Commit Phase] by writing to the ResponseWriter,
+//        - [Commit Phase] Interceptor.Commit methods run for every interceptor whose
+//          Before method was called,
+//        - [Dispatcher Phase] after the [Commit Phase], the Dispatcher's appropriate
+//          write method is called; the Dispatcher is responsible for determining whether
+//          the response is indeed safe and writing it,
+//        - if the handler attempts to write more than once, it is treated as an
+//          unrecoverable error; the request processing ends abrubptly with a panic and
+//          nothing else happens (note: this will change as soon as [After Phase] is
+//          introduced)
+//
+// Interceptors should NOT rely on the order they're run.
+func (m *ServeMux) ServeHTTP(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        m.mux.ServeHTTP(w, r)
+}</span>
+
+// Handle registers a handler for the given pattern and method. If a handler is
+// registered twice for the same pattern and method, Build will panic.
+//
+// InterceptorConfigs can be passed in order to modify the behavior of the
+// interceptors on a registered handler. Passing an InterceptorConfig whose
+// corresponding Interceptor was not installed will produce no effect. If
+// multiple configurations are passed for the same Interceptor, Mux will panic.
+func (m *ServeMux) Handle(pattern string, method string, h Handler, cfgs ...InterceptorConfig) <span class="cov8" title="1">{
+        if m.handlers[pattern] == nil </span><span class="cov8" title="1">{
+                m.handlers[pattern] = &amp;registeredHandler{
+                        pattern:          pattern,
+                        methodNotAllowed: m.methodNotAllowed,
+                        methods:          make(map[string]handlerConfig),
+                }
+                m.mux.Handle(pattern, m.handlers[pattern])
+        }</span>
+        <span class="cov8" title="1">m.handlers[pattern].handleMethod(method,
+                handlerConfig{
+                        Dispatcher:   m.dispatcher,
+                        Handler:      h,
+                        Interceptors: configureInterceptors(m.interceptors, cfgs),
+                })</span>
+}
+
+// ServeMuxConfig is a builder for ServeMux.
+type ServeMuxConfig struct {
+        dispatcher   Dispatcher
+        interceptors []Interceptor
+
+        methodNotAllowed     Handler
+        methodNotAllowedCfgs []InterceptorConfig
+}
+
+// NewServeMuxConfig crates a ServeMuxConfig with the provided Dispatcher. If
+// the provided Dispatcher is nil, the DefaultDispatcher is used.
+func NewServeMuxConfig(disp Dispatcher) *ServeMuxConfig <span class="cov8" title="1">{
+        if disp == nil </span><span class="cov8" title="1">{
+                disp = &amp;DefaultDispatcher{}
+        }</span>
+        <span class="cov8" title="1">return &amp;ServeMuxConfig{
+                dispatcher:       disp,
+                methodNotAllowed: HandlerFunc(defaultMethotNotAllowed),
+        }</span>
+}
+
+// HandleMethodNotAllowed registers a handler that runs when a given method is
+// not allowed for a registered path.
+func (s *ServeMuxConfig) HandleMethodNotAllowed(h Handler, cfgs ...InterceptorConfig) <span class="cov8" title="1">{
+        s.methodNotAllowed = h
+        s.methodNotAllowedCfgs = cfgs
+}</span>
+
+var defaultMethotNotAllowed = HandlerFunc(func(w ResponseWriter, req *IncomingRequest) Result <span class="cov8" title="1">{
+        return w.WriteError(StatusMethodNotAllowed)
+}</span>)
+
+// Intercept installs the given interceptors.
+//
+// Interceptors order is respected and interceptors are always run in the
+// order they've been installed.
+//
+// Calling Intercept multiple times is valid. Interceptors that are added last
+// will run last.
+func (s *ServeMuxConfig) Intercept(is ...Interceptor) <span class="cov8" title="1">{
+        s.interceptors = append(s.interceptors, is...)
+}</span>
+
+// Mux returns the ServeMux with a copy of the current configuration.
+func (s *ServeMuxConfig) Mux() *ServeMux <span class="cov8" title="1">{
+        devMu.Lock()
+        freezeLocalDev = true
+        if isLocalDev </span><span class="cov0" title="0">{
+                log.Println("Warning: creating safehttp.Mux in dev mode. This configuration is not valid for production use")
+        }</span>
+        <span class="cov8" title="1">devMu.Unlock()
+
+        if s.dispatcher == nil </span><span class="cov0" title="0">{
+                panic("Use NewServeMuxConfig instead of creating ServeMuxConfig using a composite literal.")</span>
+        }
+
+        <span class="cov8" title="1">methodNotAllowed := handlerConfig{
+                Dispatcher:   s.dispatcher,
+                Handler:      s.methodNotAllowed,
+                Interceptors: configureInterceptors(s.interceptors, s.methodNotAllowedCfgs),
+        }
+
+        m := &amp;ServeMux{
+                mux:              http.NewServeMux(),
+                handlers:         make(map[string]*registeredHandler),
+                dispatcher:       s.dispatcher,
+                interceptors:     s.interceptors,
+                methodNotAllowed: methodNotAllowed,
+        }
+        return m</span>
+}
+
+// Clone creates a copy of the current config.
+// This can be used to create several instances of Mux that share the same set of
+// plugins.
+func (s *ServeMuxConfig) Clone() *ServeMuxConfig <span class="cov0" title="0">{
+        return &amp;ServeMuxConfig{
+                dispatcher:           s.dispatcher,
+                interceptors:         append([]Interceptor(nil), s.interceptors...),
+                methodNotAllowed:     s.methodNotAllowed,
+                methodNotAllowedCfgs: append([]InterceptorConfig(nil), s.methodNotAllowedCfgs...),
+        }
+}</span>
+
+type registeredHandler struct {
+        pattern          string
+        methods          map[string]handlerConfig
+        methodNotAllowed handlerConfig
+}
+
+func (rh *registeredHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        cfg, ok := rh.methods[r.Method]
+        if !ok </span><span class="cov8" title="1">{
+                cfg = rh.methodNotAllowed
+        }</span>
+        <span class="cov8" title="1">processRequest(cfg, w, r)</span>
+}
+
+func (rh *registeredHandler) handleMethod(method string, cfg handlerConfig) <span class="cov8" title="1">{
+        if _, exists := rh.methods[method]; exists </span><span class="cov8" title="1">{
+                panic(fmt.Sprintf("double registration of (pattern = %q, method = %q)", rh.pattern, method))</span>
+        }
+        <span class="cov8" title="1">rh.methods[method] = cfg</span>
+}
+
+func configureInterceptors(interceptors []Interceptor, cfgs []InterceptorConfig) []configuredInterceptor <span class="cov8" title="1">{
+        var its []configuredInterceptor
+        for _, it := range interceptors </span><span class="cov8" title="1">{
+                var matches []InterceptorConfig
+                for _, c := range cfgs </span><span class="cov8" title="1">{
+                        if it.Match(c) </span><span class="cov8" title="1">{
+                                matches = append(matches, c)
+                        }</span>
+                }
+
+                <span class="cov8" title="1">if len(matches) &gt; 1 </span><span class="cov0" title="0">{
+                        msg := fmt.Sprintf("multiple configurations specified for interceptor %T: ", it)
+                        for _, match := range matches </span><span class="cov0" title="0">{
+                                msg += fmt.Sprintf("%#v", match)
+                        }</span>
+                        <span class="cov0" title="0">panic(msg)</span>
+                }
+
+                <span class="cov8" title="1">var cfg InterceptorConfig
+                if len(matches) == 1 </span><span class="cov8" title="1">{
+                        cfg = matches[0]
+                }</span>
+                <span class="cov8" title="1">its = append(its, configuredInterceptor{interceptor: it, config: cfg})</span>
+        }
+        <span class="cov8" title="1">return its</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "fmt"
+        "io"
+)
+
+// Response should encapsulate the data passed to the ResponseWriter to be
+// written by the Dispatcher. Any implementation of the interface should be
+// supported by the Dispatcher.
+type Response interface{}
+
+// ErrorResponse is an HTTP error response. The Dispatcher is responsible for
+// determining whether it is safe.
+type ErrorResponse interface {
+        Code() StatusCode
+}
+
+// JSONResponse should encapsulate a valid JSON object that will be serialised
+// and written to the http.ResponseWriter using a JSON encoder.
+type JSONResponse struct {
+        Data interface{}
+}
+
+// WriteJSON creates a JSONResponse from the data object and calls the Write
+// function of the ResponseWriter, passing the response. The data object should
+// be valid JSON, otherwise an error will occur.
+func WriteJSON(w ResponseWriter, data interface{}) Result <span class="cov0" title="0">{
+        return w.Write(JSONResponse{data})
+}</span>
+
+// Template implements a template.
+type Template interface {
+        // Execute applies data to the template and then writes the result to
+        // the io.Writer.
+        //
+        // Execute returns an error if applying the data object to the
+        // Template fails or if an error occurs while writing the result to the
+        // io.Writer.
+        Execute(wr io.Writer, data interface{}) error
+
+        // ExecuteTemplate applies the named associated template to the specified data
+        // object and writes the output to the io.Writer.
+        //
+        // ExecuteTemplate returns an error if applying the data object to the
+        // Template fails or if an error occurs while writing the result to the
+        // io.Writer.
+        ExecuteTemplate(wr io.Writer, name string, data interface{}) error
+}
+
+// TemplateResponse bundles a Template with its data and names to function
+// mappings to be passed together to the commit phase.
+type TemplateResponse struct {
+        Template Template
+        Name     string
+        Data     interface{}
+        FuncMap  map[string]interface{}
+}
+
+// ExecuteTemplate creates a TemplateResponse from the provided Template and its
+// data and calls the Write function of the ResponseWriter, passing the
+// response.
+func ExecuteTemplate(w ResponseWriter, t Template, data interface{}) Result <span class="cov0" title="0">{
+        return ExecuteNamedTemplate(w, t, "", data)
+}</span>
+
+// ExecuteNamedTemplate creates a TemplateResponse from the provided Template and its
+// data and calls the Write function of the ResponseWriter, passing the
+// response.
+// Leaving name empty is valid if the template does not have associated templates.
+func ExecuteNamedTemplate(w ResponseWriter, t Template, name string, data interface{}) Result <span class="cov0" title="0">{
+        return w.Write(&amp;TemplateResponse{Template: t, Name: name, Data: data, FuncMap: nil})
+}</span>
+
+// ExecuteTemplateWithFuncs creates a TemplateResponse from the provided
+// Template, its data and the name to function mappings and calls the Write
+// function of the ResponseWriter, passing the response.
+// Leaving name empty is valid if the template does not have associated templates.
+func ExecuteTemplateWithFuncs(w ResponseWriter, t Template, data interface{}, fm map[string]interface{}) Result <span class="cov0" title="0">{
+        return ExecuteNamedTemplateWithFuncs(w, t, "", data, fm)
+}</span>
+
+// ExecuteNamedTemplateWithFuncs creates a TemplateResponse from the provided
+// Template, its data and the name to function mappings and calls the Write
+// function of the ResponseWriter, passing the response.
+// Leaving name empty is valid if the template does not have associated templates.
+func ExecuteNamedTemplateWithFuncs(w ResponseWriter, t Template, name string, data interface{}, fm map[string]interface{}) Result <span class="cov0" title="0">{
+        return w.Write(&amp;TemplateResponse{Template: t, Name: name, Data: data, FuncMap: fm})
+}</span>
+
+// NoContentResponse is used to write a "No Content" response.
+type NoContentResponse struct{}
+
+// RedirectResponse is used to generate redirect responses.
+type RedirectResponse struct {
+        // Code is the status to use for the redirect.
+        Code StatusCode
+        // Location is the value to use for the redirect Location.
+        Location string
+        // Request is the matching request for which this response is being written.
+        // It is used to build the redirect response.
+        Request *IncomingRequest
+}
+
+// Redirect creates a RedirectResponse and writes it to w.
+// If the given code is not a valid Redirect code this function will panic.
+func Redirect(w ResponseWriter, r *IncomingRequest, location string, code StatusCode) Result <span class="cov0" title="0">{
+        if code &lt; 300 || code &gt;= 400 </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("wrong method called: redirect with status %d", code))</span>
+        }
+        <span class="cov0" title="0">return w.Write(RedirectResponse{Code: code, Location: location, Request: r})</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "context"
+        "crypto/tls"
+        "errors"
+        "net"
+        "net/http"
+        "time"
+)
+
+// Server is a safe wrapper for a standard HTTP server.
+// The zero value is safe and ready to use and will apply safe defaults on serving.
+// Changing any of the fields after the server has been started is a no-op.
+type Server struct {
+        // Addr optionally specifies the TCP address for the server to listen on,
+        // in the form "host:port". If empty, ":http" (port 80) is used.
+        // The service names are defined in RFC 6335 and assigned by IANA.
+        // See net.Dial for details of the address format.
+        Addr string
+
+        // Mux is the ServeMux to use for the current server. A nil Mux is invalid.
+        Mux *ServeMux
+
+        // TODO(empijei): potentially consider exposing ReadHeaderTimeout for
+        // fine-grained handling (e.g. websocket endpoints).
+
+        // ReadTimeout is the maximum duration for reading the entire
+        // request, including the body.
+        ReadTimeout time.Duration
+
+        // WriteTimeout is the maximum duration before timing out
+        // writes of the response. It is reset whenever a new
+        // request's header is read.
+        WriteTimeout time.Duration
+
+        // IdleTimeout is the maximum amount of time to wait for the
+        // next request when keep-alives are enabled.
+        IdleTimeout time.Duration
+
+        // MaxHeaderBytes controls the maximum number of bytes the
+        // server will read parsing the request header's keys and
+        // values, including the request line. It does not limit the
+        // size of the request body.
+        MaxHeaderBytes int
+
+        // TLSConfig optionally provides a TLS configuration for use
+        // by ServeTLS and ListenAndServeTLS. Note that this value is
+        // cloned on serving, so it's not possible to modify the
+        // configuration with methods like tls.Config.SetSessionTicketKeys.
+        //
+        // When the server is started the cloned configuration will be changed
+        // to set the minimum TLS version to 1.2 and to prefer Server Ciphers.
+        TLSConfig *tls.Config
+
+        // OnShutdown is a slice of functions to call on Shutdown.
+        // This can be used to gracefully shutdown connections that have undergone
+        // ALPN protocol upgrade or that have been hijacked.
+        // These functions should start protocol-specific graceful shutdown, but
+        // should not wait for shutdown to complete.
+        OnShudown []func()
+
+        // DisableKeepAlives controls whether HTTP keep-alives should be disabled.
+        DisableKeepAlives bool
+
+        srv     *http.Server
+        started bool
+}
+
+func (s *Server) buildStd() error <span class="cov8" title="1">{
+        if s.started </span><span class="cov0" title="0">{
+                return errors.New("server already started")
+        }</span>
+        <span class="cov8" title="1">if s.srv != nil </span><span class="cov0" title="0">{
+                // Server was already built
+                return nil
+        }</span>
+        <span class="cov8" title="1">if s.Mux == nil </span><span class="cov0" title="0">{
+                return errors.New("building server without a mux")
+        }</span>
+
+        <span class="cov8" title="1">srv := &amp;http.Server{
+                Addr:           s.Addr,
+                Handler:        s.Mux,
+                ReadTimeout:    5 * time.Second,
+                WriteTimeout:   5 * time.Second,
+                IdleTimeout:    120 * time.Second,
+                MaxHeaderBytes: 10 * 1024,
+        }
+        if s.ReadTimeout != 0 </span><span class="cov8" title="1">{
+                srv.ReadTimeout = s.ReadTimeout
+        }</span>
+        <span class="cov8" title="1">if s.WriteTimeout != 0 </span><span class="cov0" title="0">{
+                srv.WriteTimeout = s.WriteTimeout
+        }</span>
+        <span class="cov8" title="1">if s.IdleTimeout != 0 </span><span class="cov0" title="0">{
+                srv.IdleTimeout = s.IdleTimeout
+        }</span>
+        <span class="cov8" title="1">if s.MaxHeaderBytes != 0 </span><span class="cov0" title="0">{
+                srv.MaxHeaderBytes = s.MaxHeaderBytes
+        }</span>
+        <span class="cov8" title="1">if s.TLSConfig != nil </span><span class="cov0" title="0">{
+                cfg := s.TLSConfig.Clone()
+                cfg.MinVersion = tls.VersionTLS12
+                cfg.PreferServerCipherSuites = true
+                srv.TLSConfig = cfg
+        }</span>
+        <span class="cov8" title="1">for _, f := range s.OnShudown </span><span class="cov0" title="0">{
+                srv.RegisterOnShutdown(f)
+        }</span>
+        <span class="cov8" title="1">if s.DisableKeepAlives </span><span class="cov0" title="0">{
+                srv.SetKeepAlivesEnabled(false)
+        }</span>
+        <span class="cov8" title="1">s.srv = srv
+        return nil</span>
+}
+
+// Clone returns an unstarted deep copy of Server that can be re-configured and re-started.
+func (s *Server) Clone() *Server <span class="cov0" title="0">{
+        cln := *s
+        cln.started = false
+        cln.TLSConfig = s.TLSConfig.Clone()
+        cln.srv = nil
+        return &amp;cln
+}</span>
+
+// ListenAndServe is a wrapper for https://golang.org/pkg/net/http/#Server.ListenAndServe
+func (s *Server) ListenAndServe() error <span class="cov0" title="0">{
+        if err := s.buildStd(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">s.started = true
+        return s.srv.ListenAndServe()</span>
+}
+
+// ListenAndServeTLS is a wrapper for https://golang.org/pkg/net/http/#Server.ListenAndServeTLS
+func (s *Server) ListenAndServeTLS(certFile, keyFile string) error <span class="cov0" title="0">{
+        if err := s.buildStd(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">s.started = true
+        return s.srv.ListenAndServeTLS(certFile, keyFile)</span>
+}
+
+// Serve is a wrapper for https://golang.org/pkg/net/http/#Server.Serve
+func (s *Server) Serve(l net.Listener) error <span class="cov8" title="1">{
+        if err := s.buildStd(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">s.started = true
+        return s.srv.Serve(l)</span>
+}
+
+// ServeTLS is a wrapper for https://golang.org/pkg/net/http/#Server.ServeTLS
+func (s *Server) ServeTLS(l net.Listener, certFile, keyFile string) error <span class="cov0" title="0">{
+        if err := s.buildStd(); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">s.started = true
+        return s.srv.ServeTLS(l, certFile, keyFile)</span>
+}
+
+// Shutdown is a wrapper for https://golang.org/pkg/net/http/#Server.Shutdown
+func (s *Server) Shutdown(ctx context.Context) error <span class="cov0" title="0">{
+        if !s.started </span><span class="cov0" title="0">{
+                return errors.New("shutting down unstarted server")
+        }</span>
+        <span class="cov0" title="0">s.srv.SetKeepAlivesEnabled(false)
+        return s.srv.Shutdown(ctx)</span>
+}
+
+// Close is a wrapper for https://golang.org/pkg/net/http/#Server.Close
+func (s *Server) Close() error <span class="cov8" title="1">{
+        if !s.started </span><span class="cov0" title="0">{
+                return errors.New("closing unstarted server")
+        }</span>
+        <span class="cov8" title="1">return s.srv.Close()</span>
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import "net/http"
+
+// StatusCode contains HTTP status codes as registered with IANA.
+// See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
+type StatusCode int
+
+// The HTTP status codes registered with IANA.
+const (
+        StatusContinue           StatusCode = 100 // RFC 7231, 6.2.1
+        StatusSwitchingProtocols StatusCode = 101 // RFC 7231, 6.2.2
+        StatusProcessing         StatusCode = 102 // RFC 2518, 10.1
+        StatusEarlyHints         StatusCode = 103 // RFC 8297
+
+        StatusOK                   StatusCode = 200 // RFC 7231, 6.3.1
+        StatusCreated              StatusCode = 201 // RFC 7231, 6.3.2
+        StatusAccepted             StatusCode = 202 // RFC 7231, 6.3.3
+        StatusNonAuthoritativeInfo StatusCode = 203 // RFC 7231, 6.3.4
+        StatusNoContent            StatusCode = 204 // RFC 7231, 6.3.5
+        StatusResetContent         StatusCode = 205 // RFC 7231, 6.3.6
+        StatusPartialContent       StatusCode = 206 // RFC 7233, 4.1
+        StatusMultiStatus          StatusCode = 207 // RFC 4918, 11.1
+        StatusAlreadyReported      StatusCode = 208 // RFC 5842, 7.1
+        StatusIMUsed               StatusCode = 226 // RFC 3229, 10.4.1
+
+        StatusMultipleChoice   StatusCode = 300 // RFC 7231, 6.4.1
+        StatusMovedPermanently StatusCode = 301 // RFC 7231, 6.4.2
+        StatusFound            StatusCode = 302 // RFC 7231, 6.4.3
+        StatusSeeOther         StatusCode = 303 // RFC 7231, 6.4.4
+        StatusNotModified      StatusCode = 304 // RFC 7232, 4.1
+        StatusUseProxy         StatusCode = 305 // RFC 7231, 6.4.5
+
+        StatusTemporaryRedirect StatusCode = 307 // RFC 7231, 6.4.7
+        StatusPermanentRedirect StatusCode = 308 // RFC 7538, 3
+
+        StatusBadRequest                   StatusCode = 400 // RFC 7231, 6.5.1
+        StatusUnauthorized                 StatusCode = 401 // RFC 7235, 3.1
+        StatusPaymentRequired              StatusCode = 402 // RFC 7231, 6.5.2
+        StatusForbidden                    StatusCode = 403 // RFC 7231, 6.5.3
+        StatusNotFound                     StatusCode = 404 // RFC 7231, 6.5.4
+        StatusMethodNotAllowed             StatusCode = 405 // RFC 7231, 6.5.5
+        StatusNotAcceptable                StatusCode = 406 // RFC 7231, 6.5.6
+        StatusProxyAuthRequired            StatusCode = 407 // RFC 7235, 3.2
+        StatusRequestTimeout               StatusCode = 408 // RFC 7231, 6.5.7
+        StatusConflict                     StatusCode = 409 // RFC 7231, 6.5.8
+        StatusGone                         StatusCode = 410 // RFC 7231, 6.5.9
+        StatusLengthRequired               StatusCode = 411 // RFC 7231, 6.5.10
+        StatusPreconditionFailed           StatusCode = 412 // RFC 7232, 4.2
+        StatusRequestEntityTooLarge        StatusCode = 413 // RFC 7231, 6.5.11
+        StatusRequestURITooLong            StatusCode = 414 // RFC 7231, 6.5.12
+        StatusUnsupportedMediaType         StatusCode = 415 // RFC 7231, 6.5.13
+        StatusRequestedRangeNotSatisfiable StatusCode = 416 // RFC 7233, 4.4
+        StatusExpectationFailed            StatusCode = 417 // RFC 7231, 6.5.14
+        StatusTeapot                       StatusCode = 418 // RFC 7168, 2.3.3
+        StatusMisdirectedRequest           StatusCode = 421 // RFC 7540, 9.1.2
+        StatusUnprocessableEntity          StatusCode = 422 // RFC 4918, 11.2
+        StatusLocked                       StatusCode = 423 // RFC 4918, 11.3
+        StatusFailedDependency             StatusCode = 424 // RFC 4918, 11.4
+        StatusTooEarly                     StatusCode = 425 // RFC 8470, 5.2.
+        StatusUpgradeRequired              StatusCode = 426 // RFC 7231, 6.5.15
+        StatusPreconditionRequired         StatusCode = 428 // RFC 6585, 3
+        StatusTooManyRequests              StatusCode = 429 // RFC 6585, 4
+        StatusRequestHeaderFieldsTooLarg   StatusCode = 431 // RFC 6585, 5
+        StatusUnavailableForLegalReasons   StatusCode = 451 // RFC 7725, 3
+
+        StatusInternalServerError           StatusCode = 500 // RFC 7231, 6.6.1
+        StatusNotImplemented                StatusCode = 501 // RFC 7231, 6.6.2
+        StatusBadGateway                    StatusCode = 502 // RFC 7231, 6.6.3
+        StatusServiceUnavailable            StatusCode = 503 // RFC 7231, 6.6.4
+        StatusGatewayTimeout                StatusCode = 504 // RFC 7231, 6.6.5
+        StatusHTTPVersionNotSupported       StatusCode = 505 // RFC 7231, 6.6.6
+        StatusVariantAlsoNegotiates         StatusCode = 506 // RFC 2295, 8.1
+        StatusInsufficientStorage           StatusCode = 507 // RFC 4918, 11.5
+        StatusLoopDetected                  StatusCode = 508 // RFC 5842, 7.2
+        StatusNotExtended                   StatusCode = 510 // RFC 2774, 7
+        StatusNetworkAuthenticationRequired StatusCode = 511 // RFC 6585, 6
+)
+
+// Code implements ErrorResponse.
+func (c StatusCode) Code() StatusCode <span class="cov8" title="1">{
+        return c
+}</span>
+
+func (c StatusCode) String() string <span class="cov0" title="0">{
+        return http.StatusText(int(c))
+}</span>
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">// Copyright 2020 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package safehttp
+
+import (
+        "net/url"
+)
+
+// URL represents a parsed URL (technically, a URI reference).
+type URL struct {
+        url *url.URL
+}
+
+// Query parses the query string in the URL and returns a form
+// containing its values. The returned error describes the first
+// decoding error encountered, if any.
+func (u URL) Query() (Form, error) <span class="cov8" title="1">{
+        v, err := url.ParseQuery(u.url.RawQuery)
+        if err != nil </span><span class="cov8" title="1">{
+                return Form{}, err
+        }</span>
+        <span class="cov8" title="1">return Form{values: map[string][]string(v)}, nil</span>
+}
+
+// String reassembles the URL into a valid URL string.
+//
+// The method uses the net/url.EscapedPath method to obtain the path.
+// See the net/url.EscapedPath method for more details.
+func (u URL) String() string <span class="cov8" title="1">{
+        // The escaping is perfomed by u.url.String()
+        return u.url.String()
+}</span>
+
+// Host returns the host or the host:port of the URL.
+func (u URL) Host() string <span class="cov8" title="1">{
+        return u.url.Host
+}</span>
+
+// Hostname returns the host of the URL, stripping any valid
+// port number if present.
+//
+// If the result is enclosed in square brackets, as literal IPv6
+// addresses are, the square brackets are removed from the result.
+func (u URL) Hostname() string <span class="cov8" title="1">{
+        return u.url.Hostname()
+}</span>
+
+// Port returns the port part of the URL. If the
+// host doesn't contain a valid port number, Port returns an
+// empty string.
+func (u URL) Port() string <span class="cov8" title="1">{
+        return u.url.Port()
+}</span>
+
+// Path returns the path of the URL.
+//
+// Note that the path is stored in decoded form: /%47%6f%2f
+// becomes /Go/. A consequence is that it is impossible to tell
+// which slashes in the path were slashes in the rawURL and which
+// were %2f.
+func (u URL) Path() string <span class="cov8" title="1">{
+        return u.url.Path
+}</span>
+
+// ParseURL parses a raw URL string into a URL structure.
+//
+// The raw URl may be relative (a path, without a host) or absolute (starting
+// with a scheme). Trying to parse a hostname and path without a scheme is
+// invalid but may not necessarily return an error, due to parsing ambiguities.
+func ParseURL(rawurl string) (*URL, error) <span class="cov8" title="1">{
+        parsed, err := url.Parse(rawurl)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return &amp;URL{url: parsed}, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
