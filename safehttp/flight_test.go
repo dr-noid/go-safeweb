@@ -163,3 +163,12 @@ func TestFlightDoubleWritePanics(t *testing.T) {
 	}
 
 }
+
+func TestCoverageFlightWrite(t *testing.T) {
+    safehttp.InitializeCoverageMap()
+	TestFlightInterceptorPanic(t)
+	TestFlightHandlerPanic(t)
+	TestFlightDoubleWritePanics(t)
+
+    safehttp.PrintCoverage()
+}
