@@ -32,6 +32,18 @@ use the cover tool to get a nice visual display:
 
 <The following is supposed to be repeated for each group member>
 
+Group member name: Nika Emadian
+
+Function 1 name: SameSite
+
+![](/existing-coverage/cookie.png)
+
+Function 2 name: Write 
+
+![](/existing-coverage/write.png)
+
+[GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/5fb77332308d05571fa3160aff046c01725fd559)
+
 Group Member: Berat Kir
 
 Function 1: echo

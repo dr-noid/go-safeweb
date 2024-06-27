@@ -1,4 +1,5 @@
 package safehttp
+import "fmt"
 
 import "fmt"
 
@@ -21,6 +22,13 @@ func InitializeCoverageMap() {
 	Coverage["uptime-1"] = false
 	Coverage["uptime-2"] = false
 	Coverage["uptime-3"] = false
+  
+  Coverage["cookie-1"] = false
+	Coverage["cookie-2"] = false
+	Coverage["cookie-3"] = false
+	Coverage["Write-1"] = false
+	Coverage["Write-2"] = false
+	Coverage["Write-3"] = false
 }
 
 func PrintCoverage() {
