@@ -60,21 +60,27 @@ Function 2: uptime
 
 <The following is supposed to be repeated for each group member>
 
-<Group member name>
+Group member name: Nika Emadian
 
-<Test 1>
+Test 1: TestFlightValueNil
 
-<Show a patch (diff) or a link to a commit made in your forked repository that shows the new/enhanced test>
+[GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/7ad3e7c330db30aa69769a367bfd1039aa7af64a))
 
-<Provide a screenshot of the old coverage results (the same as you already showed above)>
+![Old coverage](/existing-coverage/FlightValuesold.png)
 
-<Provide a screenshot of the new coverage results>
+![New coverage](/existing-coverage/FlightValuesnew.png)
 
-<State the coverage improvement with a number and elaborate on why the coverage is improved>
+Fligth.go had a coverage of 89.5% initially, while by testing FlightValues it was increased to 92.1%.
 
-<Test 2>
+Test 2: TestFlightAddCookie
 
-<Provide the same kind of information provided for Test 1>
+[GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/7ad3e7c330db30aa69769a367bfd1039aa7af64a))
+
+![Old coverage](/existing-coverage/AddCookieOld.png)
+
+![New coverage](/existing-coverage/AddCookieNew.png)
+
+By tetsing the second function the coverage incearsed from 92.1% to 94.7%.
 
 ### Overall
 

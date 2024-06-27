@@ -89,7 +89,7 @@ github.com/google/go-safeweb/safehttp/flight.go:101.2,103.59 3 1
 github.com/google/go-safeweb/safehttp/flight.go:103.59,104.13 1 0
 github.com/google/go-safeweb/safehttp/flight.go:106.2,106.17 1 1
 github.com/google/go-safeweb/safehttp/flight.go:111.34,113.2 1 1
-github.com/google/go-safeweb/safehttp/flight.go:118.45,120.2 1 1
+github.com/google/go-safeweb/safehttp/flight.go:118.45,120.2 1 0
 github.com/google/go-safeweb/safehttp/flight.go:126.45,127.52 1 1
 github.com/google/go-safeweb/safehttp/flight.go:127.52,129.3 1 1
 github.com/google/go-safeweb/safehttp/flight.go:143.26,145.2 1 1
@@ -192,9 +192,9 @@ github.com/google/go-safeweb/safehttp/header.go:103.47,104.13 1 1
 github.com/google/go-safeweb/safehttp/header.go:106.2,106.21 1 1
 github.com/google/go-safeweb/safehttp/header.go:112.41,114.2 1 1
 github.com/google/go-safeweb/safehttp/header.go:123.46,128.2 4 1
-github.com/google/go-safeweb/safehttp/header.go:135.44,137.13 2 1
+github.com/google/go-safeweb/safehttp/header.go:135.44,137.13 2 0
 github.com/google/go-safeweb/safehttp/header.go:137.13,139.3 1 0
-github.com/google/go-safeweb/safehttp/header.go:140.2,141.12 2 1
+github.com/google/go-safeweb/safehttp/header.go:140.2,141.12 2 0
 github.com/google/go-safeweb/safehttp/header.go:148.51,151.26 1 1
 github.com/google/go-safeweb/safehttp/header.go:151.26,153.3 1 1
 github.com/google/go-safeweb/safehttp/header.go:154.2,154.21 1 1
