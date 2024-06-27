@@ -22,10 +22,11 @@ run the tests and save the coverage data in 'coverage.out'
 <code>go test -coverprofile coverage.out ./...</code>
 use the cover tool to get a nice visual display:
 <code>go tool cover -html=coverage.out</code>
-![f](/existing-coverage/image1.png)
-![alt text](image.png)
-![alt text](image.png)
-![alt text](image.png)
+
+![coverage1](existing-coverage/image1.png)
+![coverage2](existing-coverage/image2.png)
+![coverage3](existing-coverage/image3.png)
+![coverage4](existing-coverage/image4.png)
 
 ### Your own coverage tool
 
@@ -43,6 +44,15 @@ Function 2 name: Write
 
 [GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/5fb77332308d05571fa3160aff046c01725fd559)
 
+Group Member: Berat Kir
+
+Function 1: echo
+
+Function 2: uptime
+
+![alt text](existing-coverage/dr-noid-coverage.png)
+
+[GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/b071a38bd809d8afcf3be28dace3da369f5fe4c2)
 
 ## Coverage improvement
 

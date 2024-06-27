@@ -148,6 +148,7 @@ func TestFlightDoubleWritePanics(t *testing.T) {
 	}
 
 }
+
 type MockFlightContext struct {
 }
 
@@ -169,5 +170,12 @@ func (m MockFlightContext) Value(key interface{}) interface{} {
 
 func TestFlightValueNil(t *testing.T) {
     safehttp.FlightValues(MockFlightContext{})
+}
 
+func TestCoverageFlightWrite(t *testing.T) {
+  safehttp.InitializeCoverageMap()
+	TestFlightInterceptorPanic(t)
+	TestFlightHandlerPanic(t)
+	TestFlightDoubleWritePanics(t)
+  safehttp.PrintCoverage()
 }

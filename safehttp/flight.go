@@ -79,14 +79,17 @@ func processRequest(cfg handlerConfig, rw http.ResponseWriter, req *http.Request
 // underlying http.ResponseWriter if the Dispatcher decides it's safe to do so.
 func (f *flight) Write(resp Response) Result {
 	if f.written {
+		Coverage["flight/write-1"] = true
 		panic("ResponseWriter was already written to")
 	}
 	f.written = true
 	f.commitPhase(resp)
 
 	if err := f.cfg.Dispatcher.Write(f.rw, resp); err != nil {
+		Coverage["flight/write-2"] = true
 		panic(err)
 	}
+	Coverage["flight/write-3"] = true
 	return Result{}
 }
 
@@ -96,13 +99,16 @@ func (f *flight) Write(resp Response) Result {
 // If the ResponseWriter has already been written to, then this method will panic.
 func (f *flight) WriteError(resp ErrorResponse) Result {
 	if f.written {
+		Coverage["flight/writeError-1"] = true
 		panic("ResponseWriter was already written to")
 	}
 	f.written = true
 	f.commitPhase(resp)
 	if err := f.cfg.Dispatcher.Error(f.rw, resp); err != nil {
+		Coverage["flight/writeError-2"] = true
 		panic(err)
 	}
+	Coverage["flight/writeError-3"] = true
 	return Result{}
 }
 
