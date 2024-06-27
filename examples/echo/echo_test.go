@@ -111,3 +111,11 @@ func TestUptime(t *testing.T) {
 		}
 	}
 }
+
+func TestCoverage(t *testing.T) {
+	safehttp.InitializeCoverageMap()
+	TestEcho(t)
+	TestUptime(t)
+
+	safehttp.PrintCoverage()
+}

@@ -1,5 +1,7 @@
 package safehttp
+
 import "fmt"
+
 var Coverage = make(map[string]bool)
 
 func InitializeCoverageMap() {
@@ -12,8 +14,15 @@ func InitializeCoverageMap() {
 	Coverage["flight/writeError-2"] = false
 	Coverage["flight/writeError-3"] = false
 
+	Coverage["echo-1"] = false
+	Coverage["echo-2"] = false
+	Coverage["echo-3"] = false
 
+	Coverage["uptime-1"] = false
+	Coverage["uptime-2"] = false
+	Coverage["uptime-3"] = false
 }
+
 func PrintCoverage() {
     for key, value := range Coverage {
         if value {

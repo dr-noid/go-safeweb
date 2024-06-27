@@ -22,26 +22,25 @@ run the tests and save the coverage data in 'coverage.out'
 <code>go test -coverprofile coverage.out ./...</code>
 use the cover tool to get a nice visual display:
 <code>go tool cover -html=coverage.out</code>
-![f](/existing-coverage/image1.png)
-![alt text](image.png)
-![alt text](image.png)
-![alt text](image.png)
+
+![coverage1](existing-coverage/image1.png)
+![coverage2](existing-coverage/image2.png)
+![coverage3](existing-coverage/image3.png)
+![coverage4](existing-coverage/image4.png)
 
 ### Your own coverage tool
 
 <The following is supposed to be repeated for each group member>
 
-<Group member name>
+Group Member: Berat Kir
 
-<Function 1 name>
+Function 1: echo
 
-<Show a patch (diff) or a link to a commit made in your forked repository that shows the instrumented code to gather coverage measurements>
+Function 2: uptime
 
-<Provide a screenshot of the coverage results output by the instrumentation>
+![alt text](existing-coverage/dr-noid-coverage.png)
 
-<Function 2 name>
-
-<Provide the same kind of information provided for Function 1>
+[GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/b071a38bd809d8afcf3be28dace3da369f5fe4c2)
 
 ## Coverage improvement
 
