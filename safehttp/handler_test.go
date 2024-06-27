@@ -58,7 +58,7 @@ func TestStripPrefix(t *testing.T) {
 	}
 
 }
-	
+
 // needs another test to cover the case where the prefix is empty
 func TestStripPrefixPanic(t *testing.T) {
 	mux := safehttp.NewServeMuxConfig(nil).Mux()
@@ -79,26 +79,24 @@ func TestStripPrefixPanic(t *testing.T) {
 }
 
 func TestStripPrefixEmpty(t *testing.T) {
-    mux := safehttp.NewServeMuxConfig(nil).Mux()
+	mux := safehttp.NewServeMuxConfig(nil).Mux()
 
-    mux.Handle("/", safehttp.MethodGet, BarHandler)
-    mux.Handle("/more/bar", safehttp.MethodGet, safehttp.StripPrefix("", BarHandler)) // Test with an empty prefix
+	mux.Handle("/", safehttp.MethodGet, BarHandler)
+	mux.Handle("/more/bar", safehttp.MethodGet, safehttp.StripPrefix("", BarHandler)) // Test with an empty prefix
 
-    r := httptest.NewRequest(safehttp.MethodGet, "http://foo.com/", nil)
-    rw := httptest.NewRecorder()
-    mux.ServeHTTP(rw, r)
+	r := httptest.NewRequest(safehttp.MethodGet, "http://foo.com/", nil)
+	rw := httptest.NewRecorder()
+	mux.ServeHTTP(rw, r)
 
-    rStrip := httptest.NewRequest(safehttp.MethodGet, "http://foo.com/more/bar", nil)
-    rwStrip := httptest.NewRecorder()
-    mux.ServeHTTP(rwStrip, rStrip)
+	rStrip := httptest.NewRequest(safehttp.MethodGet, "http://foo.com/more/bar", nil)
+	rwStrip := httptest.NewRecorder()
+	mux.ServeHTTP(rwStrip, rStrip)
 
-    if rwStrip.Code != rw.Code {
-        t.Errorf("Code got %v, want %v", rwStrip.Code, rw.Code)
-    }
+	if rwStrip.Code != rw.Code {
+		t.Errorf("Code got %v, want %v", rwStrip.Code, rw.Code)
+	}
 
 }
-
-
 
 // create coverage test for handler.go
 func TestCoverageHandler(t *testing.T) {

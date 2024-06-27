@@ -70,7 +70,7 @@ const (
 // SameSite sets the SameSite attribute.
 func (c *Cookie) SameSite(s SameSite) {
 	switch s {
-	
+
 	case SameSiteLaxMode:
 		c.wrapped.SameSite = http.SameSiteLaxMode
 		Coverage["cookie-1"] = true

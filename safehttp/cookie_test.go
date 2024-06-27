@@ -134,12 +134,11 @@ func TestCookieValue(t *testing.T) {
 	}
 }
 
-
 func TestCoverage(t *testing.T) {
-    InitializeCoverageMap()
-    TestCookie(t)
-    TestCookieName(t)
+	InitializeCoverageMap()
+	TestCookie(t)
+	TestCookieName(t)
 	TestCookieValue(t)
 
-    PrintCoverage()
+	PrintCoverage()
 }

@@ -21,14 +21,14 @@ func InitializeCoverageMap() {
 	Coverage["uptime-1"] = false
 	Coverage["uptime-2"] = false
 	Coverage["uptime-3"] = false
-  
-  Coverage["cookie-1"] = false
+
+	Coverage["cookie-1"] = false
 	Coverage["cookie-2"] = false
 	Coverage["cookie-3"] = false
 	Coverage["Write-1"] = false
 	Coverage["Write-2"] = false
 	Coverage["Write-3"] = false
-  
+
 	Coverage["StripPrefix_1"] = false
 	Coverage["StripPrefix_2"] = false
 	Coverage["StripPrefix_3"] = false
@@ -39,11 +39,11 @@ func InitializeCoverageMap() {
 }
 
 func PrintCoverage() {
-    for key, value := range Coverage {
-        if value {
-            fmt.Println("Branch", key, "was taken")
-        } else {
-            fmt.Println("Branch", key, "was not taken")
-        }
-    }
+	for key, value := range Coverage {
+		if value {
+			fmt.Println("Branch", key, "was taken")
+		} else {
+			fmt.Println("Branch", key, "was not taken")
+		}
+	}
 }

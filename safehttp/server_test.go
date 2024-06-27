@@ -75,10 +75,10 @@ func TestServer(t *testing.T) {
 }
 
 func TestServerNotStarted(t *testing.T) {
-    s := Server{
-        Mux:         &ServeMux{},
-        ReadTimeout: time.Duration(0),
-    }
-    s.started = false
-    s.Close()
+	s := Server{
+		Mux:         &ServeMux{},
+		ReadTimeout: time.Duration(0),
+	}
+	s.started = false
+	s.Close()
 }

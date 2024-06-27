@@ -1,10 +1,10 @@
 package safehttp_test
 
 import (
-	"time"
 	"fmt"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/google/go-safeweb/safehttp"
 	"github.com/google/safehtml"
@@ -55,7 +55,7 @@ func TestFlightInterceptorPanic(t *testing.T) {
 			mux := mb.Mux()
 
 			mux.Handle("/search", safehttp.MethodGet, safehttp.HandlerFunc(func(w safehttp.ResponseWriter, r *safehttp.IncomingRequest) safehttp.Result {
-			
+
 				w.Header().Set("foo", "bar")
 				return w.Write(safehtml.HTMLEscaped("<h1>Hello World!</h1>"))
 			}))
@@ -153,29 +153,29 @@ type MockFlightContext struct {
 }
 
 func (m MockFlightContext) Deadline() (deadline time.Time, ok bool) {
-    return time.Time{}, false
+	return time.Time{}, false
 }
 
 func (m MockFlightContext) Done() <-chan struct{} {
-    return nil
+	return nil
 }
 
 func (m MockFlightContext) Err() error {
-    return nil
+	return nil
 }
 
 func (m MockFlightContext) Value(key interface{}) interface{} {
-    return nil
+	return nil
 }
 
 func TestFlightValueNil(t *testing.T) {
-    safehttp.FlightValues(MockFlightContext{})
+	safehttp.FlightValues(MockFlightContext{})
 }
 
 func TestCoverageFlightWrite(t *testing.T) {
-  safehttp.InitializeCoverageMap()
+	safehttp.InitializeCoverageMap()
 	TestFlightInterceptorPanic(t)
 	TestFlightHandlerPanic(t)
 	TestFlightDoubleWritePanics(t)
-  safehttp.PrintCoverage()
+	safehttp.PrintCoverage()
 }
