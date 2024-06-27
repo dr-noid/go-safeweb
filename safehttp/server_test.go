@@ -73,3 +73,12 @@ func TestServer(t *testing.T) {
 		t.Errorf("Builder did not set WriteTimeout: got %v want %v", s.srv.WriteTimeout, 5*time.Second)
 	}
 }
+
+func TestServerNotStarted(t *testing.T) {
+    s := Server{
+        Mux:         &ServeMux{},
+        ReadTimeout: time.Duration(0),
+    }
+    s.started = false
+    s.Close()
+}

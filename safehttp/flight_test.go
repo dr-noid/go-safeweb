@@ -1,20 +1,7 @@
-// Copyright 2020 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//	https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package safehttp_test
 
 import (
+	"time"
 	"fmt"
 	"net/http/httptest"
 	"testing"
@@ -68,8 +55,7 @@ func TestFlightInterceptorPanic(t *testing.T) {
 			mux := mb.Mux()
 
 			mux.Handle("/search", safehttp.MethodGet, safehttp.HandlerFunc(func(w safehttp.ResponseWriter, r *safehttp.IncomingRequest) safehttp.Result {
-				// IMPORTANT: We are setting the header here and expecting to be
-				// cleared if a panic occurs.
+			
 				w.Header().Set("foo", "bar")
 				return w.Write(safehtml.HTMLEscaped("<h1>Hello World!</h1>"))
 			}))
@@ -103,8 +89,7 @@ func TestFlightHandlerPanic(t *testing.T) {
 	mux := mb.Mux()
 
 	mux.Handle("/search", safehttp.MethodGet, safehttp.HandlerFunc(func(w safehttp.ResponseWriter, r *safehttp.IncomingRequest) safehttp.Result {
-		// IMPORTANT: We are setting the header here and expecting to be
-		// cleared if a panic occurs.
+
 		w.Header().Set("foo", "bar")
 		panic("handler")
 	}))
@@ -162,4 +147,35 @@ func TestFlightDoubleWritePanics(t *testing.T) {
 		}
 	}
 
+}
+
+type MockFlightContext struct {
+}
+
+func (m MockFlightContext) Deadline() (deadline time.Time, ok bool) {
+    return time.Time{}, false
+}
+
+func (m MockFlightContext) Done() <-chan struct{} {
+    return nil
+}
+
+func (m MockFlightContext) Err() error {
+    return nil
+}
+
+func (m MockFlightContext) Value(key interface{}) interface{} {
+    return nil
+}
+
+func TestFlightValueNil(t *testing.T) {
+    safehttp.FlightValues(MockFlightContext{})
+}
+
+func TestCoverageFlightWrite(t *testing.T) {
+  safehttp.InitializeCoverageMap()
+	TestFlightInterceptorPanic(t)
+	TestFlightHandlerPanic(t)
+	TestFlightDoubleWritePanics(t)
+  safehttp.PrintCoverage()
 }
