@@ -135,8 +135,10 @@ func (h Header) Values(name string) []string {
 func (h Header) addCookie(c *Cookie) error {
 	v := c.String()
 	if v == "" {
+		Coverage["Header_addCookie_1"] = true
 		return errors.New("invalid cookie name")
 	}
+	Coverage["Header_addCookie_2"] = true
 	h.wrapped.Add("Set-Cookie", v)
 	return nil
 }

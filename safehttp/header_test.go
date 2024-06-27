@@ -374,3 +374,45 @@ func TestHeaderIsClaimedSetCookie(t *testing.T) {
 		t.Errorf(`h.IsClaimed("Set-Cookie") got: %v want: true`, got)
 	}
 }
+
+func TestHeader_AddCookie(t *testing.T) {
+    t.Run("ValidCookie", func(t *testing.T) {
+        h := NewHeader(http.Header{})
+        validCookie := NewCookie("test", "value")
+        err := h.addCookie(validCookie)
+        if err != nil {
+            t.Errorf("Unexpected error adding valid cookie: %v", err)
+        }
+    })
+
+    t.Run("InvalidCookie", func(t *testing.T) {
+        h := NewHeader(http.Header{})
+        invalidCookie := NewCookie("", "value")
+        err := h.addCookie(invalidCookie)
+        if err == nil {
+            t.Error("Expected error adding invalid cookie, but got none")
+        } else if err.Error() != "invalid cookie name" {
+            t.Errorf("Unexpected error message adding invalid cookie: got %q, want %q", err.Error(), "invalid cookie name")
+        }
+    })
+
+    t.Run("CheckValidCookie", func(t *testing.T) {
+        h := NewHeader(http.Header{})
+        validCookie := NewCookie("test", "value")
+        _ = h.addCookie(validCookie)
+		
+        expectedHeaderValue := "test=value; HttpOnly; Secure; SameSite=Lax"
+        if h.Get("Set-Cookie") != expectedHeaderValue {
+            t.Errorf("Unexpected header value after adding valid cookie: got %q, want %q", h.Get("Set-Cookie"), expectedHeaderValue)
+        }
+    })
+}
+
+// create coverage test for header.go
+func TestCoverageHeader(t *testing.T) {
+	InitializeCoverageMap()
+
+	TestHeader_AddCookie(t)
+
+	PrintCoverage()
+}
