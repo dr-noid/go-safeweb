@@ -79,12 +79,15 @@ func main() {
 func echo(w safehttp.ResponseWriter, req *safehttp.IncomingRequest) safehttp.Result {
 	q, err := req.URL().Query()
 	if err != nil {
+		safehttp.Coverage["echo-1"] = true
 		return w.WriteError(safehttp.StatusBadRequest)
 	}
 	x := q.String("message", "")
 	if len(x) == 0 {
+		safehttp.Coverage["echo-2"] = true
 		return w.WriteError(safehttp.StatusBadRequest)
 	}
+	safehttp.Coverage["echo-3"] = true
 	return w.Write(safehtml.HTMLEscaped(x))
 }
 
@@ -102,11 +105,14 @@ func uptime(w safehttp.ResponseWriter, req *safehttp.IncomingRequest) safehttp.R
 	// Easter egg handling.
 	q, err := req.URL().Query()
 	if err != nil {
+		safehttp.Coverage["uptime-1"] = true
 		return w.WriteError(safehttp.StatusBadRequest)
 	}
 	if egg := q.String("easter_egg", ""); len(egg) != 0 {
+		safehttp.Coverage["uptime-2"] = true
 		x.EasterEgg = egg
 	}
 
+	safehttp.Coverage["uptime-3"] = true
 	return safehttp.ExecuteTemplate(w, uptimeTmpl, x)
 }
