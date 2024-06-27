@@ -42,7 +42,7 @@ Function 2 name: Write
 
 ![](/existing-coverage/write.png)
 
-[GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/5fb77332308d05571fa3160aff046c01725fd559)
+[](https://github.com/dr-noid/go-safeweb/commit/5fb77332308d05571fa3160aff046c01725fd559)
 
 Group Member: Berat Kir
 
@@ -64,7 +64,7 @@ Group member name: Nika Emadian
 
 Test 1: TestFlightValueNil
 
-[GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/7ad3e7c330db30aa69769a367bfd1039aa7af64a))
+[](https://github.com/dr-noid/go-safeweb/commit/7ad3e7c330db30aa69769a367bfd1039aa7af64a)
 
 ![Old coverage](/existing-coverage/FlightValuesold.png)
 
@@ -74,7 +74,7 @@ Fligth.go had a coverage of 89.5% initially, while by testing FlightValues it wa
 
 Test 2: TestFlightAddCookie
 
-[GitHub Commit](https://github.com/dr-noid/go-safeweb/commit/7ad3e7c330db30aa69769a367bfd1039aa7af64a))
+[](https://github.com/dr-noid/go-safeweb/commit/7ad3e7c330db30aa69769a367bfd1039aa7af64a)
 
 ![Old coverage](/existing-coverage/AddCookieOld.png)
 
